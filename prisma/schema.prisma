@@ -1,0 +1,29 @@
+// 这是我们的Prisma数据库模型文件
+
+// 数据库配置：SQLite数据库，适合本地轻量级应用
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// 图书模型
+model Book {
+  id          Int      @id @default(autoincrement())
+  isbn        String   @unique // ISBN编号，唯一
+  title       String   // 书名
+  author      String?  // 作者
+  publisher   String?  // 出版社
+  pubdate     String?  // 出版日期
+  price       String?  // 价格
+  summary     String?  // 摘要
+  coverUrl    String?  // 封面图片URL
+  pages       Int?     // 页数
+  addedAt     DateTime @default(now()) // 添加时间
+  borrowedBy  String?  // 借阅人
+  borrowedAt  DateTime? // 借阅时间
+  returnDate  DateTime? // 预计归还时间
+} 
