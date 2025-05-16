@@ -20,7 +20,8 @@
 项目提供了方便的启动脚本，可以自动完成环境配置、依赖安装和项目启动：
 
 ### Windows系统
-```start.bat
+```bash
+start.bat
 ```
 
 ### Mac/Linux系统
