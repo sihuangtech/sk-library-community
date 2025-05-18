@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   // 获取配置中的管理员凭据
   const config = useRuntimeConfig(event)
-  const { adminUsername, adminPassword } = config
+  const { adminUsername, adminPassword, authSessionMaxAgeDays } = config
   
   // 解析请求体
   const body = await readBody(event)
@@ -17,14 +17,14 @@ export default defineEventHandler(async (event) => {
   
   // 验证凭据是否匹配
   if (username === adminUsername && password === adminPassword) {
-    // 设置cookie有效期为两星期（14天）
-    const twoWeeksInSeconds = 60 * 60 * 24 * 14
+    // 从环境变量中获取会话有效期（单位：天）并转换为秒
+    const sessionMaxAgeInSeconds = 60 * 60 * 24 * authSessionMaxAgeDays
     
     // 设置会话cookie
     setCookie(event, 'auth_session', 'authenticated', {
       httpOnly: true,
       path: '/',
-      maxAge: twoWeeksInSeconds, // 两星期
+      maxAge: sessionMaxAgeInSeconds,
       secure: process.env.NODE_ENV === 'production'
     })
     

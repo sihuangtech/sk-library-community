@@ -57,10 +57,21 @@ interface BookInfo {
   author: string;
   publisher: string;
   pubdate: string;
-  price: string;
+  price: string | number;
   summary: string;
   coverUrl: string | null;
   pages: number;
+  
+  // 新增扩展字段
+  pressPlace?: string;
+  binding?: string;
+  language?: string;
+  format?: string;
+  edition?: string;
+  words?: string;
+  clcCode?: string;
+  clcName?: string;
+  pictures?: string;
 }
 
 // 状态管理
@@ -115,7 +126,18 @@ const searchBook = async () => {
         price: result.data.price || '未知价格',
         summary: result.data.summary || '暂无简介',
         coverUrl: result.data.coverUrl || null,
-        pages: result.data.pages || 0
+        pages: result.data.pages || null,
+        
+        // 新增扩展字段
+        pressPlace: result.data.pressPlace,
+        binding: result.data.binding,
+        language: result.data.language, 
+        format: result.data.format,
+        edition: result.data.edition,
+        words: result.data.words,
+        clcCode: result.data.clcCode,
+        clcName: result.data.clcName,
+        pictures: result.data.pictures
       }
     } else {
       throw new Error('未找到图书信息')

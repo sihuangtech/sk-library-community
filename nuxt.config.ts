@@ -1,4 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+// 检测是否在Electron环境中运行
+const isElectron = process.env.npm_lifecycle_event?.startsWith('app:')
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
@@ -31,12 +35,27 @@ export default defineNuxtConfig({
     adminUsername: process.env.NUXT_ADMIN_USERNAME,
     adminPassword: process.env.NUXT_ADMIN_PASSWORD,
     
+    // 身份验证会话配置
+    authSessionMaxAgeDays: parseInt(process.env.NUXT_AUTH_SESSION_MAX_AGE_DAYS),
+    
     // 公共配置（会暴露给客户端）
     public: {
       // 调试模式开关（默认禁用）
       enableDebug: process.env.NUXT_PUBLIC_ENABLE_DEBUG,
       // 环境标识
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
+      // 是否在Electron中运行
+      isElectron: isElectron
+    }
+  },
+  
+  // 在Electron模式下使用客户端渲染
+  ssr: isElectron ? false : true,
+  
+  // 当在Electron中运行时的额外配置
+  nitro: {
+    output: {
+      publicDir: '.output/public'
     }
   }
 })

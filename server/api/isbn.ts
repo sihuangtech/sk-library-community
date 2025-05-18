@@ -10,9 +10,9 @@ export default defineEventHandler(async (event) => {
   
   // 检查是否提供了ISBN
   if (!query.isbn) {
-    throw createError({
+    return createError({
       statusCode: 400,
-      statusMessage: '请提供ISBN编号'
+      message: '请提供ISBN编号'
     })
   }
   
@@ -26,9 +26,9 @@ export default defineEventHandler(async (event) => {
     })
     
     if (!response.ok) {
-      throw createError({
+      return createError({
         statusCode: response.status,
-        statusMessage: `ISBN查询失败: ${response.statusText}`
+        message: `ISBN查询失败: ${response.statusText}`
       })
     }
     
@@ -36,22 +36,37 @@ export default defineEventHandler(async (event) => {
     
     // 检查API返回结果是否成功
     if (!result.success || result.code !== 0) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: '未找到图书信息或API返回错误'
+      return createError({
+        statusCode: 404,
+        message: '未找到图书信息或API返回错误'
       })
     }
     
     // 转换数据格式以适应前端组件期望的格式
     const bookData = {
       data: {
+        isbn: result.data.isbn,
         title: result.data.bookName,
         author: result.data.author,
         publisher: result.data.press,
         pubdate: result.data.pressDate,
-        price: (result.data.price / 100).toFixed(2) + '元', // 价格从分转换为元
+        // 将价格从整数（单位：分）转换为带小数点的字符串（单位：元）
+        price: result.data.price ? String((Number(result.data.price) / 100).toFixed(2)) : null,
         summary: result.data.bookDesc,
-        pages: parseInt(result.data.pages) || 0,
+        pages: parseInt(result.data.pages) || null,
+        
+        // 新增扩展字段
+        pressPlace: result.data.pressPlace,
+        binding: result.data.binding,
+        language: result.data.language,
+        format: result.data.format,
+        edition: result.data.edition,
+        words: result.data.words,
+        clcCode: result.data.clcCode,
+        clcName: result.data.clcName,
+        pictures: result.data.pictures, // 保留原始图片JSON字符串
+        
+        // 处理封面图片
         coverUrl: null
       }
     }
@@ -67,13 +82,16 @@ export default defineEventHandler(async (event) => {
       console.error('解析图书封面失败:', e)
     }
     
+    // 记录完整的数据结构，方便调试
+    console.log('处理后的图书数据:', JSON.stringify(bookData, null, 2))
+    
     return bookData
   } catch (error) {
     console.error('ISBN查询错误:', error)
-    throw createError({
+    
+    return createError({
       statusCode: 500,
-      statusMessage: '无法连接到ISBN服务',
-      data: error
+      message: '无法连接到ISBN服务'
     })
   }
 }) 

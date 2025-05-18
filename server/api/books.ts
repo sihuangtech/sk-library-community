@@ -34,16 +34,28 @@ export default defineEventHandler(async (event) => {
   if (method === 'POST') {
     const body = await readBody(event)
     
+    // 处理价格：如果是大于100的整数，假定它是以分为单位，转换为元并格式化
+    if (body.price !== null && body.price !== undefined) {
+      const priceNum = Number(body.price)
+      if (!isNaN(priceNum) && priceNum > 100) { // 可能是以分为单位
+        body.price = (priceNum / 100).toFixed(2)
+      } else if (!isNaN(priceNum)) {
+        body.price = priceNum.toFixed(2)
+      }
+      // 如果已经是字符串格式且包含小数点，则保持不变
+    }
+    
     try {
-      const book = await prisma.book.create({
+      const newBook = await prisma.book.create({
         data: body
       })
-      return book
+      
+      return newBook
     } catch (error) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: '创建书籍失败',
-        data: error
+      console.error('创建书籍失败:', error)
+      return createError({
+        statusCode: 500,
+        message: '创建书籍失败'
       })
     }
   }
@@ -54,23 +66,24 @@ export default defineEventHandler(async (event) => {
     const id = Number(url.pathname.split('/').pop())
     
     if (isNaN(id)) {
-      throw createError({
+      return createError({
         statusCode: 400,
-        statusMessage: '无效的书籍ID'
+        message: '无效的书籍ID'
       })
     }
     
     try {
-      const book = await prisma.book.update({
+      const updatedBook = await prisma.book.update({
         where: { id },
         data: body
       })
-      return book
+      
+      return updatedBook
     } catch (error) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: '更新书籍失败',
-        data: error
+      console.error('更新书籍失败:', error)
+      return createError({
+        statusCode: 500,
+        message: '更新书籍失败'
       })
     }
   }
@@ -80,9 +93,9 @@ export default defineEventHandler(async (event) => {
     const id = Number(url.pathname.split('/').pop())
     
     if (isNaN(id)) {
-      throw createError({
+      return createError({
         statusCode: 400,
-        statusMessage: '无效的书籍ID'
+        message: '无效的书籍ID'
       })
     }
     
@@ -90,12 +103,13 @@ export default defineEventHandler(async (event) => {
       await prisma.book.delete({
         where: { id }
       })
-      return { message: '删除成功' }
+      
+      return { success: true }
     } catch (error) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: '删除书籍失败',
-        data: error
+      console.error('删除书籍失败:', error)
+      return createError({
+        statusCode: 500,
+        message: '删除书籍失败'
       })
     }
   }

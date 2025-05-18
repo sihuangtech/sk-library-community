@@ -1,0 +1,10 @@
+-- AlterTable
+ALTER TABLE "Book" ADD COLUMN "binding" TEXT;
+ALTER TABLE "Book" ADD COLUMN "clcCode" TEXT;
+ALTER TABLE "Book" ADD COLUMN "clcName" TEXT;
+ALTER TABLE "Book" ADD COLUMN "edition" TEXT;
+ALTER TABLE "Book" ADD COLUMN "format" TEXT;
+ALTER TABLE "Book" ADD COLUMN "language" TEXT;
+ALTER TABLE "Book" ADD COLUMN "pictures" TEXT;
+ALTER TABLE "Book" ADD COLUMN "pressPlace" TEXT;
+ALTER TABLE "Book" ADD COLUMN "words" TEXT;

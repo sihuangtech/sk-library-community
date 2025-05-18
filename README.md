@@ -52,7 +52,7 @@ NUXT_ADMIN_PASSWORD=secret_password
 NUXT_PUBLIC_ENABLE_DEBUG=false
 
 # 数据库配置
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="file:./library.db"
 ```
 
 重要的环境变量说明：
@@ -165,7 +165,68 @@ bun run preview
 
 ## 关于数据库
 
-本项目使用SQLite作为本地数据库，通过Prisma ORM进行交互。数据库文件存储在`prisma/dev.db`。
+本项目使用SQLite作为本地数据库，通过Prisma ORM进行交互。数据库文件存储在`prisma/library.db`。
+
+### 数据库初始化
+
+首次启动项目时，需要进行数据库初始化。系统提供了两种方式：
+
+#### 方式1：使用快速启动脚本
+
+使用项目提供的启动脚本时，会自动进行数据库初始化：
+
+```bash
+# Windows系统
+start.bat
+
+# Mac/Linux系统
+chmod +x start.sh  # 只需要第一次运行时执行
+./start.sh
+```
+
+#### 方式2：手动初始化
+
+如果您想手动初始化数据库，请按照以下步骤操作：
+
+1. 确保已安装项目依赖：
+```bash
+npm install
+```
+
+2. 创建数据库结构并应用迁移：
+```bash
+npx prisma migrate dev
+```
+
+3. 如果需要重置数据库（删除所有数据并重新创建结构）：
+```bash
+npx prisma migrate reset
+```
+
+4. 查看数据库内容（可选，需要安装Prisma Studio）：
+```bash
+npx prisma studio
+```
+这会启动一个图形界面（默认端口5555），可以浏览和修改数据库内容。
+
+### 数据库结构
+
+系统使用以下数据模型：
+
+- **图书(Book)**：包含ISBN、标题、作者、出版社等基本信息，以及借阅状态
+  - 主要字段：isbn, title, author, publisher, pubdate, price等
+  - 借阅相关字段：borrowedBy, borrowedAt, returnDate
+
+若需查看完整数据模型定义，请参考`prisma/schema.prisma`文件。
+
+### 数据备份与恢复
+
+SQLite数据库存储在单一文件中，备份非常简单：
+
+1. **备份**：复制`prisma/library.db`文件到安全位置即可
+2. **恢复**：用备份的数据库文件替换当前的`prisma/library.db`文件
+
+建议定期备份数据库文件，特别是在添加大量图书信息后。
 
 ## 贡献指南
 

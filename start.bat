@@ -36,7 +36,7 @@ if not exist .env (
     echo. >> .env
     
     echo # 数据库配置 >> .env
-    echo DATABASE_URL="file:./dev.db" >> .env
+    echo DATABASE_URL="file:./library.db" >> .env
     
     echo 环境变量配置完成！
 )

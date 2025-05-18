@@ -1,11 +1,31 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <div>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <MessageBox
+      v-model:visible="messageVisible"
+      :title="messageConfig.title"
+      :message="messageConfig.message"
+      :type="messageConfig.type"
+      :button-text="messageConfig.buttonText"
+      :show-cancel-button="messageConfig.showCancelButton"
+      :cancel-button-text="messageConfig.cancelButtonText"
+      :close-on-click-overlay="messageConfig.closeOnClickOverlay"
+      @confirm="messageConfirm"
+      @cancel="messageCancel"
+      @close="messageClose"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
+import { useMessage } from '~/composables/useMessage'
+
 const { $auth } = useNuxtApp()
+
+// 获取消息服务
+const { visible: messageVisible, messageConfig, closeMessage } = useMessage()
 
 // 在组件挂载时验证用户会话
 onMounted(async () => {
@@ -21,6 +41,21 @@ onMounted(async () => {
     $auth.setLoggedIn(false)
   }
 })
+
+// 消息关闭回调
+const messageClose = (result: boolean) => {
+  closeMessage(result)
+}
+
+// 消息确认回调
+const messageConfirm = () => {
+  closeMessage(true)
+}
+
+// 消息取消回调
+const messageCancel = () => {
+  closeMessage(false)
+}
 </script>
 
 <style>

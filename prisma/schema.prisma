@@ -5,9 +5,19 @@ generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+datasource db {  
+  provider = "sqlite"  
+  url = "file:./library.db"
+  }
+
+// 分类模型
+model Category {
+  id           Int         @id @default(autoincrement())
+  name         String      // 分类名称
+  description  String?     // 分类描述
+  createdAt    DateTime    @default(now()) // 创建时间
+  updatedAt    DateTime    @updatedAt // 更新时间
+  books        BookCategory[] // 关联的图书
 }
 
 // 图书模型
@@ -22,8 +32,33 @@ model Book {
   summary     String?  // 摘要
   coverUrl    String?  // 封面图片URL
   pages       Int?     // 页数
+  
+  // 新增字段
+  pressPlace  String?  // 出版地
+  binding     String?  // 装帧方式 (平装/精装)
+  language    String?  // 语言
+  format      String?  // 开本 (如16开)
+  edition     String?  // 版本
+  words       String?  // 字数
+  clcCode     String?  // 中图分类号
+  clcName     String?  // 分类名称
+  pictures    String?  // 图片列表 (JSON字符串)
+  
   addedAt     DateTime @default(now()) // 添加时间
   borrowedBy  String?  // 借阅人
   borrowedAt  DateTime? // 借阅时间
   returnDate  DateTime? // 预计归还时间
+  
+  categories  BookCategory[] // 关联的分类
+}
+
+// 图书与分类的多对多关系模型
+model BookCategory {
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade) // 级联删除
+  bookId     Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade) // 级联删除
+  categoryId Int
+  addedAt    DateTime @default(now()) // 添加到分类的时间
+
+  @@id([bookId, categoryId]) // 复合主键
 } 

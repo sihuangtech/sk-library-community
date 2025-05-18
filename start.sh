@@ -38,7 +38,7 @@ if [ ! -f .env ]; then
         echo
         
         echo "# 数据库配置"
-        echo 'DATABASE_URL="file:./dev.db"'
+        echo 'DATABASE_URL="file:./library.db"'
     } > .env
     
     echo "环境变量配置完成！"
