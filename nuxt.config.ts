@@ -22,6 +22,14 @@ export default defineNuxtConfig({
     // '@nuxt/ui'
   ],
   
+  // 实验性功能配置 - 解决跨平台兼容性问题
+  experimental: {
+    // 禁用可能导致oxc-parser问题的功能
+    scanPageMeta: false,
+    // 使用传统的构建方式避免oxc-parser
+    externalVue: false
+  },
+  
   // 开发服务器配置
   devServer: {
     port: appConfig.server.port,
@@ -31,9 +39,7 @@ export default defineNuxtConfig({
   // 全局中间件配置
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
-    layoutTransition: { name: 'layout', mode: 'out-in' },
-    // 注册全局中间件
-    middleware: ['global']
+    layoutTransition: { name: 'layout', mode: 'out-in' }
   },
   
   // 运行时配置（从YAML配置文件读取）
@@ -67,10 +73,6 @@ export default defineNuxtConfig({
   
   // Nitro服务器配置（生产模式）
   nitro: {
-    // 生产模式下的服务器端口（从 config.yaml 读取）
-    port: appConfig.server.port,
-    // 设置主机地址（从 config.yaml 读取）
-    host: appConfig.server.host,
     output: {
       publicDir: '.output/public'
     },
@@ -87,21 +89,23 @@ export default defineNuxtConfig({
       options: {
         target: 'esnext'
       }
-    },
-    // 强制将 Prisma 客户端作为外部依赖
-    noExternal: false
+    }
   },
   
-  // Vite 配置，进一步优化 Prisma 支持
+  // Vite 配置，进一步优化 Prisma 支持和解决oxc-parser问题
   vite: {
     define: {
       global: 'globalThis'
     },
     optimizeDeps: {
-      include: ['@prisma/client']
+      include: ['@prisma/client'],
+      // 排除有问题的包
+      exclude: ['oxc-parser']
     },
     ssr: {
-      noExternal: ['@prisma/client']
+      noExternal: ['@prisma/client'],
+      // 排除oxc-parser避免服务端渲染问题
+      external: ['oxc-parser']
     }
   }
 })

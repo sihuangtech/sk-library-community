@@ -1,4 +1,5 @@
 import { execSync } from 'child_process'
+import { PrismaClient } from '@prisma/client'
 import prisma from '~/utils/prisma'
 import { promisify } from 'util'
 import { exec } from 'child_process'
@@ -31,7 +32,6 @@ export default defineEventHandler(async (event) => {
     
     // 3. 验证数据库连接
     console.log('验证数据库连接...')
-    const prisma = new PrismaClient()
     await prisma.$connect()
     
     // 4. 检查表是否创建成功
