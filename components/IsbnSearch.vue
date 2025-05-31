@@ -189,13 +189,14 @@ const saveBook = async () => {
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem;
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease;
 }
 
 h2 {
-  color: #4361ee;
+  color: var(--primary-color);
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
 }
@@ -212,14 +213,17 @@ h2 {
 input {
   flex: 1;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px 0 0 4px;
   font-size: 1rem;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 button {
   padding: 0.75rem 1.5rem;
-  background-color: #4361ee;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 0 4px 4px 0;
@@ -238,7 +242,8 @@ button:disabled {
 }
 
 .hint {
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.7;
   font-size: 0.85rem;
   margin-top: 0.5rem;
 }
@@ -267,9 +272,9 @@ button:disabled {
 }
 
 .search-result h3 {
-  color: #4361ee;
+  color: var(--primary-color);
   margin-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
 
@@ -282,7 +287,7 @@ button:disabled {
   flex-shrink: 0;
   width: 150px;
   height: 200px;
-  background-color: #f0f0f0;
+  background-color: var(--secondary-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -303,17 +308,20 @@ button:disabled {
 .book-title {
   font-size: 1.3rem;
   font-weight: bold;
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 0.5rem;
 }
 
 .book-details p {
   margin-bottom: 0.5rem;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 .summary {
   margin-top: 1rem;
-  color: #555;
+  color: var(--text-color);
+  opacity: 0.8;
   font-size: 0.95rem;
   max-height: 120px;
   overflow-y: auto;

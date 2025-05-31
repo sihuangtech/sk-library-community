@@ -45,7 +45,8 @@ model Book {
   pictures    String?  // 图片列表 (JSON字符串)
   
   addedAt     DateTime @default(now()) // 添加时间
-  borrowedBy  String?  // 借阅人
+  borrowedBy  String?  // 借阅人姓名
+  borrowerPhone String? // 借阅人手机号
   borrowedAt  DateTime? // 借阅时间
   returnDate  DateTime? // 预计归还时间
   

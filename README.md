@@ -1,241 +1,179 @@
 # 家庭图书管理系统
 
-这是一个基于Nuxt.js开发的家庭图书管理系统，可以帮助您管理家庭图书收藏，追踪借阅情况。
+这是一个基于Nuxt.js开发的家庭图书管理系统，可以帮助您管理家庭图书收藏，追踪借阅情况。系统采用现代化的Web技术栈，提供直观易用的界面和强大的功能。
 
-## 功能特点
+## ✨ 功能特点
 
-- 通过ISBN自动获取图书信息
-- 图书管理：添加、编辑、删除图书
-- 借阅管理：记录借出和归还情况
-- 响应式设计：适配各种设备屏幕
-- 本地数据库：使用SQLite本地存储数据
+- 📚 **图书管理**：添加、编辑、删除图书，支持ISBN自动获取信息
+- 🔍 **智能搜索**：按标题、作者、ISBN等多维度搜索
+- 📖 **借阅管理**：记录借出和归还情况，逾期提醒
+- 📊 **数据统计**：图书数量、分类、借阅情况统计
+- 🎨 **响应式设计**：适配各种设备屏幕
+- 🗄️ **本地存储**：使用SQLite本地数据库，数据安全可控
+- 🔐 **安全认证**：管理员登录保护，会话管理
+- 🔄 **一键更新**：自动更新系统和数据库备份
 
-## 环境要求
+## 🚀 快速开始
+
+### 环境要求
 
 - Node.js 18.0+
 - NPM 8.0+
+- Git（用于更新功能）
 
-## 快速启动
+### 一键启动
 
-项目提供了方便的启动脚本，可以自动完成环境配置、依赖安装和项目启动：
+项目提供了自动化启动脚本，首次使用推荐此方式：
 
-### Windows系统
+**Windows系统**
 ```bash
 start.bat
 ```
 
-### Mac/Linux系统
+**Mac/Linux系统**
 ```bash
-chmod +x start.sh  # 只需要第一次运行时执行
+chmod +x start.sh
 ./start.sh
 ```
 
-启动脚本会引导您：
-1. 输入必要的配置信息（ISBN API密钥、管理员账户等）
-2. 自动安装项目依赖
-3. 初始化数据库
-4. 启动开发服务器
+启动脚本会自动：
+- 检查环境依赖
+- 引导配置系统（API密钥、管理员账户等）
+- 安装项目依赖
+- 初始化数据库
+- 启动开发服务器
 
-## 环境变量配置
-
-项目使用环境变量进行配置，启动脚本会自动创建`.env`文件并引导您填写信息。如需手动配置，请创建`.env`文件：
-
-```
-# API密钥
-ISBN_API_KEY=your_isbn_api_key_here
-
-# 管理员账户
-NUXT_ADMIN_USERNAME=admin
-NUXT_ADMIN_PASSWORD=secret_password
-
-# 应用配置
-NUXT_PUBLIC_ENABLE_DEBUG=false
-
-# 数据库配置
-DATABASE_URL="file:./library.db"
-```
-
-重要的环境变量说明：
-- `NUXT_ADMIN_USERNAME` 和 `NUXT_ADMIN_PASSWORD`：管理员登录凭据
-- `NUXT_PUBLIC_ENABLE_DEBUG`：是否启用调试页面（true/false）
-
-## 手动安装
-
-如果不使用快速启动脚本，可以按照以下步骤手动安装：
+### 手动安装
 
 ```bash
-# 安装依赖
+# 1. 安装依赖
 npm install
 
-# 创建数据库
-npx prisma migrate dev
+# 2. 配置系统（复制并编辑配置文件）
+cp config.yaml.example config.yaml
+
+# 3. 初始化数据库
+npx prisma migrate dev --name init
+
+# 4. 启动应用
+npm run dev
 ```
 
-## 开发服务器
+应用将在 http://localhost:3008 启动。
 
-启动开发服务器，访问 `http://localhost:3000`：
+## 📖 文档
+
+详细的使用和部署文档位于 `docs/` 目录：
+
+- **[部署文档](docs/DEPLOYMENT.md)** - 详细的部署步骤、配置说明和生产环境部署
+- **[用户指南](docs/USER_GUIDE.md)** - 完整的功能使用说明和最佳实践
+- **[更新文档](docs/UPDATE.md)** - 一键更新和回滚功能详解
+- **[API文档](docs/API.md)** - 完整的API接口文档和使用示例
+
+## 🔄 系统更新
+
+项目提供了一键更新功能，可以安全地从仓库拉取最新代码：
+
+**Windows系统**
+```bash
+update.bat
+```
+
+**Mac/Linux系统**
+```bash
+./update.sh
+```
+
+更新功能包含：
+- 自动备份数据库和配置
+- 智能检测新版本
+- 安全的代码更新
+- 依赖包同步
+- 数据库迁移
+
+如果更新出现问题，可以使用回滚脚本快速恢复：
+```bash
+rollback.bat    # Windows
+./rollback.sh   # Mac/Linux
+```
+
+## 🛠️ 技术栈
+
+这是一个基于现代Web技术构建的全栈应用，采用Nuxt.js作为主要框架，集成了Prisma ORM进行数据库管理，使用Tailwind CSS和Nuxt UI构建现代化界面，通过SQLite提供轻量级本地数据存储，并集成第三方ISBN API实现图书信息自动获取功能。
+
+## 📁 项目结构
+
+```
+├── components/          # Vue组件
+├── layouts/            # 页面布局
+├── pages/              # 页面路由
+├── server/api/         # API端点
+├── prisma/             # 数据库配置
+├── middleware/         # 中间件
+├── plugins/            # 插件
+├── docs/               # 项目文档
+├── start.bat/sh        # 启动脚本
+├── update.bat/sh       # 更新脚本
+├── rollback.bat/sh     # 回滚脚本
+└── config.yaml         # 系统配置
+```
+
+## 🔧 开发
 
 ```bash
-# npm
+# 开发模式
 npm run dev
 
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## 生产环境
-
-构建生产环境应用：
-
-```bash
-# npm
+# 构建生产版本
 npm run build
 
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-本地预览生产环境构建：
-
-```bash
-# npm
+# 预览生产版本
 npm run preview
 
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-## 调试模式
-
-系统包含一个调试页面，可以帮助开发者查看会话状态和执行调试操作。
-
-1. 在`.env`文件中设置`NUXT_PUBLIC_ENABLE_DEBUG=true`
-2. 重启应用
-3. 访问`/debug`路径
-
-注意：调试页面仅在设置环境变量后才能访问，且需要管理员登录。
-
-## 项目结构
-
-- `components/` - Vue组件
-  - `IsbnSearch.vue` - ISBN搜索组件
-  - `BookList.vue` - 图书列表组件
-- `layouts/` - 页面布局
-  - `default.vue` - 默认布局
-- `pages/` - 页面路由
-  - `index.vue` - 首页
-  - `books/index.vue` - 图书列表页
-  - `books/add.vue` - 添加图书页
-  - `borrow.vue` - 借阅管理页
-  - `debug.vue` - 调试页面
-- `prisma/` - Prisma数据库配置
-  - `schema.prisma` - 数据库模型定义
-- `server/api/` - API端点
-  - `books.ts` - 图书API
-  - `isbn.ts` - ISBN查询API
-  - `auth/` - 认证相关API
-- `start.bat` - Windows系统启动脚本
-- `start.sh` - Mac/Linux系统启动脚本
-
-## 认证与授权
-
-系统使用基于Cookie的认证机制。所有非登录页面都受到保护，未登录用户会被重定向到登录页面。
-
-## ISBN API
-
-本项目使用 [ISBN Market API](https://market.isbn.work/) 来获取图书信息。
-
-## 关于数据库
-
-本项目使用SQLite作为本地数据库，通过Prisma ORM进行交互。数据库文件存储在`prisma/library.db`。
-
-### 数据库初始化
-
-首次启动项目时，需要进行数据库初始化。系统提供了两种方式：
-
-#### 方式1：使用快速启动脚本
-
-使用项目提供的启动脚本时，会自动进行数据库初始化：
-
-```bash
-# Windows系统
-start.bat
-
-# Mac/Linux系统
-chmod +x start.sh  # 只需要第一次运行时执行
-./start.sh
-```
-
-#### 方式2：手动初始化
-
-如果您想手动初始化数据库，请按照以下步骤操作：
-
-1. 确保已安装项目依赖：
-```bash
-npm install
-```
-
-2. 创建数据库结构并应用迁移：
-```bash
-npx prisma migrate dev
-```
-
-3. 如果需要重置数据库（删除所有数据并重新创建结构）：
-```bash
-npx prisma migrate reset
-```
-
-4. 查看数据库内容（可选，需要安装Prisma Studio）：
-```bash
+# 数据库管理
 npx prisma studio
 ```
-这会启动一个图形界面（默认端口5555），可以浏览和修改数据库内容。
 
-### 数据库结构
+## 🗄️ 数据库
 
-系统使用以下数据模型：
+系统使用SQLite作为本地数据库，数据文件为 `library.db`。
 
-- **图书(Book)**：包含ISBN、标题、作者、出版社等基本信息，以及借阅状态
-  - 主要字段：isbn, title, author, publisher, pubdate, price等
-  - 借阅相关字段：borrowedBy, borrowedAt, returnDate
+**Web界面初始化**（推荐）：
+1. 登录系统后访问"系统设置"页面
+2. 点击"一键初始化数据库"按钮
 
-若需查看完整数据模型定义，请参考`prisma/schema.prisma`文件。
+**命令行初始化**：
+```bash
+npx prisma migrate dev --name init
+```
 
-### 数据备份与恢复
+## 🔐 认证与安全
 
-SQLite数据库存储在单一文件中，备份非常简单：
+- 基于Cookie的会话认证
+- 管理员账户保护
+- 所有管理功能需要登录
+- 配置文件中设置管理员凭据
 
-1. **备份**：复制`prisma/library.db`文件到安全位置即可
-2. **恢复**：用备份的数据库文件替换当前的`prisma/library.db`文件
+## 📝 ISBN API
 
-建议定期备份数据库文件，特别是在添加大量图书信息后。
+本项目使用 [ISBN Market API](https://market.isbn.work/) 获取图书信息。需要在配置文件中设置API密钥。
 
-## 贡献指南
+## 🤝 贡献
 
-1. Fork本仓库
-2. 创建您的功能分支 (`git checkout -b feature/amazing-feature`)
-3. 提交您的改动 (`git commit -m 'Add some amazing feature'`)
+1. Fork 本仓库
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add some amazing feature'`)
 4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 开启一个Pull Request
+5. 开启 Pull Request
 
-## 版权信息
+## 📄 许可证
 
-根据 MIT 许可证开源。查看 [`LICENSE`](LICENSE) 文件了解更多信息。
+本项目基于 MIT 许可证开源。查看 [LICENSE](LICENSE) 文件了解更多信息。
+
+## 🆘 支持
+
+- 📖 查阅 [用户指南](docs/USER_GUIDE.md) 了解详细使用方法
+- 🚀 查阅 [部署文档](docs/DEPLOYMENT.md) 了解部署和配置
+- 🔄 查阅 [更新文档](docs/UPDATE.md) 了解更新和维护
+- 🔧 查阅 [API文档](docs/API.md) 了解接口详情
+- 💬 在项目仓库提交 Issue 获取技术支持

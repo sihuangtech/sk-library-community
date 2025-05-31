@@ -1,7 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { loadConfig } from './utils/config'
 
 // 检测是否在Electron环境中运行
 const isElectron = process.env.npm_lifecycle_event?.startsWith('app:')
+
+// 加载YAML配置
+const appConfig = loadConfig()
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
@@ -12,11 +16,17 @@ export default defineNuxtConfig({
     // '@nuxt/content',
     // '@nuxt/fonts',
     '@nuxt/icon',
-    '@nuxt/image',
+    // '@nuxt/image',  // 暂时禁用以解决初始化问题
     '@nuxt/scripts',
     '@nuxt/test-utils',
     // '@nuxt/ui'
   ],
+  
+  // 开发服务器配置
+  devServer: {
+    port: appConfig.server.port,
+    host: '0.0.0.0'
+  },
   
   // 全局中间件配置
   app: {
@@ -26,36 +36,72 @@ export default defineNuxtConfig({
     middleware: ['global']
   },
   
-  // 运行时配置（包括环境变量）
+  // 运行时配置（从YAML配置文件读取）
   runtimeConfig: {
     // 服务器端私有密钥（不暴露给客户端）
-    isbnApiKey: process.env.ISBN_API_KEY,
+    isbnApiKey: appConfig.api.isbn_key,
     
-    // 管理员账户配置（仅服务器端可访问）
-    adminUsername: process.env.NUXT_ADMIN_USERNAME,
-    adminPassword: process.env.NUXT_ADMIN_PASSWORD,
+    // 管理员密码配置（仅服务器端可访问）
+    adminPassword: appConfig.admin.password,
     
     // 身份验证会话配置
-    authSessionMaxAgeDays: parseInt(process.env.NUXT_AUTH_SESSION_MAX_AGE_DAYS),
+    authSessionMaxAgeDays: appConfig.auth.session_max_age_days,
     
     // 公共配置（会暴露给客户端）
     public: {
-      // 调试模式开关（默认禁用）
-      enableDebug: process.env.NUXT_PUBLIC_ENABLE_DEBUG,
+      // 调试模式开关
+      enableDebug: appConfig.debug.enabled,
       // 环境标识
       nodeEnv: process.env.NODE_ENV,
       // 是否在Electron中运行
-      isElectron: isElectron
+      isElectron: isElectron,
+      // 应用端口
+      appPort: appConfig.server.port,
+      // 管理员用户名（可以暴露给客户端）
+      adminUsername: appConfig.admin.username
     }
   },
   
   // 在Electron模式下使用客户端渲染
   ssr: isElectron ? false : true,
   
-  // 当在Electron中运行时的额外配置
+  // Nitro服务器配置（生产模式）
   nitro: {
+    // 生产模式下的服务器端口（从 config.yaml 读取）
+    port: appConfig.server.port,
+    // 设置主机地址（从 config.yaml 读取）
+    host: appConfig.server.host,
     output: {
       publicDir: '.output/public'
+    },
+    // 启用实验性 WASM 支持
+    experimental: {
+      wasm: true
+    },
+    // Rollup 配置，解决 Prisma 构建问题
+    rollupConfig: {
+      external: ['.prisma/client/index-browser', '.prisma/client', '@prisma/client']
+    },
+    // 添加 esbuild 配置
+    esbuild: {
+      options: {
+        target: 'esnext'
+      }
+    },
+    // 强制将 Prisma 客户端作为外部依赖
+    noExternal: false
+  },
+  
+  // Vite 配置，进一步优化 Prisma 支持
+  vite: {
+    define: {
+      global: 'globalThis'
+    },
+    optimizeDeps: {
+      include: ['@prisma/client']
+    },
+    ssr: {
+      noExternal: ['@prisma/client']
     }
   }
 })

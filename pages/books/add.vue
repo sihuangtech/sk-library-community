@@ -19,7 +19,7 @@
 }
 
 h1 {
-  color: #4361ee;
+  color: var(--primary-color);
   margin-bottom: 0.5rem;
   font-size: 2rem;
   text-align: center;
@@ -27,7 +27,8 @@ h1 {
 
 .subtitle {
   text-align: center;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.7;
   margin-bottom: 2rem;
 }
 </style> 

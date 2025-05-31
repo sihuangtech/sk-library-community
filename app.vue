@@ -66,9 +66,51 @@ const messageCancel = () => {
   padding: 0;
 }
 
+/* CSS变量定义 */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #e9ecef;
+  --card-bg: #ffffff;
+  --primary-color: #4361ee;
+  --secondary-color: #f8f9fa;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 深色模式变量 */
+:root.dark {
+  --bg-color: #1a1a1a;
+  --text-color: #e2e8f0;
+  --border-color: #4a5568;
+  --card-bg: #2d3748;
+  --primary-color: #4361ee;
+  --secondary-color: #4a5568;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
 body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   line-height: 1.6;
-  color: #333;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 确保深色模式下的滚动条样式 */
+:root.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+:root.dark ::-webkit-scrollbar-track {
+  background: #2d3748;
+}
+
+:root.dark ::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 4px;
+}
+
+:root.dark ::-webkit-scrollbar-thumb:hover {
+  background: #718096;
 }
 </style>

@@ -1,0 +1,52 @@
+# 家庭图书管理系统配置文件模板
+# 请复制此文件为 config.yaml 并根据您的需求修改配置
+
+# 服务器配置
+server:
+  # 应用端口（前后端统一，开发和生产模式都使用此端口）
+  port: 3008
+
+# 网站信息配置
+site:
+  # 网站名称
+  name: "家庭图书管理系统"
+  # 版本号
+  version: "1.0.0"
+  # 版权所有者
+  copyright_owner: "彩旗工作室"
+  
+  # 备案信息
+  filing:
+    # ICP备案号（如：京ICP备12345678号-1）
+    icp_number: ""
+    # 公安备案号（如：京公网安备11010802012345号）
+    police_number: ""
+    # 是否显示备案信息
+    show_filing: false
+
+# API配置
+api:
+  # ISBN查询API密钥 - 请在 https://data.isbn.work 申请
+  isbn_key: "your-isbn-api-key-here"
+
+# 数据库配置
+database:
+  # SQLite数据库文件路径
+  url: "file:./library.db"
+
+# 管理员账户配置
+admin:
+  # 管理员用户名 - 请修改为您的用户名
+  username: "admin"
+  # 管理员密码 - 请修改为强密码
+  password: "your-secure-password"
+
+# 身份验证配置
+auth:
+  # 登录会话有效期（天）
+  session_max_age_days: 14
+
+# 调试配置
+debug:
+  # 是否启用调试模式（开发时可设为true）
+  enabled: false 

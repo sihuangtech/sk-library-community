@@ -1,0 +1,51 @@
+# 服务器配置
+server:
+  # 应用端口（前后端统一，开发和生产模式都使用此端口）
+  port: 3008
+  # 服务器主机地址
+  host: 127.0.0.1
+
+# 网站信息配置
+site:
+  # 网站名称
+  name: "家庭图书管理系统"
+  # 版本号
+  version: "1.0.0"
+  # 版权所有者
+  copyright_owner: "彩旗工作室"
+  
+  # 备案信息
+  filing:
+    # ICP备案号（如：京ICP备12345678号-1）
+    icp_number: "闽ICP备2023001950号-1"
+    # 公安备案号（如：京公网安备11010802012345号）
+    police_number: "闽公网安备35052102000601号"
+    # 是否显示备案信息
+    show_filing: true
+
+# API配置
+api:
+  # ISBN查询API密钥
+  isbn_key: "ae1718d4587744b0b79f940fbef69e77"
+
+# 数据库配置
+database:
+  # SQLite数据库文件路径
+  url: "file:./library.db"
+
+# 管理员账户配置
+admin:
+  # 管理员用户名
+  username: "晨光中"
+  # 管理员密码
+  password: "09098"
+
+# 身份验证配置
+auth:
+  # 登录会话有效期（天）
+  session_max_age_days: 14
+
+# 调试配置
+debug:
+  # 是否启用调试模式
+  enabled: false 

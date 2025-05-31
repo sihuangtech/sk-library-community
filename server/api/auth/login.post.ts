@@ -1,7 +1,9 @@
 export default defineEventHandler(async (event) => {
   // 获取配置中的管理员凭据
   const config = useRuntimeConfig(event)
-  const { adminUsername, adminPassword, authSessionMaxAgeDays } = config
+  const adminUsername = config.public.adminUsername  // 从 public 配置中读取用户名
+  const adminPassword = config.adminPassword         // 从私有配置中读取密码
+  const authSessionMaxAgeDays = config.authSessionMaxAgeDays
   
   // 解析请求体
   const body = await readBody(event)

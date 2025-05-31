@@ -50,7 +50,7 @@ const router = useRouter()
 const isLoggedIn = computed(() => $auth.isLoggedIn)
 
 // 检查是否处于调试模式
-const isDebugMode = computed(() => config.public.enableDebug === 'true')
+const isDebugMode = computed(() => config.public.enableDebug === true)
 
 // 检查登录状态并重定向
 onMounted(async () => {
@@ -72,20 +72,22 @@ onMounted(async () => {
 .hero {
   text-align: center;
   padding: 3rem 1rem;
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   margin-bottom: 2rem;
+  transition: background-color 0.3s ease;
 }
 
 .hero h1 {
-  color: #4361ee;
+  color: var(--primary-color);
   font-size: 2.5rem;
   margin-bottom: 1rem;
 }
 
 .hero p {
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
   font-size: 1.2rem;
   margin-bottom: 2rem;
 }
@@ -101,7 +103,7 @@ onMounted(async () => {
   border-radius: 4px;
   text-decoration: none;
   font-weight: bold;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .add-button {
@@ -111,15 +113,17 @@ onMounted(async () => {
 
 .add-button:hover {
   background-color: #059669;
+  transform: translateY(-2px);
 }
 
 .view-button {
-  background-color: #4361ee;
+  background-color: var(--primary-color);
   color: white;
 }
 
 .view-button:hover {
   background-color: #3a56d4;
+  transform: translateY(-2px);
 }
 
 .features {
@@ -130,12 +134,12 @@ onMounted(async () => {
 }
 
 .feature-card {
-  background-color: white;
+  background-color: var(--card-bg);
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   text-align: center;
-  transition: transform 0.3s;
+  transition: transform 0.3s, background-color 0.3s ease;
 }
 
 .feature-card:hover {
@@ -148,23 +152,25 @@ onMounted(async () => {
 }
 
 .feature-card h3 {
-  color: #4361ee;
+  color: var(--primary-color);
   margin-bottom: 0.5rem;
 }
 
 .feature-card p {
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 .quick-search {
-  background-color: white;
+  background-color: var(--card-bg);
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease;
 }
 
 .quick-search h2 {
-  color: #4361ee;
+  color: var(--primary-color);
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -172,14 +178,16 @@ onMounted(async () => {
 .user-info {
   margin-bottom: 1.5rem;
   padding: 0.5rem;
-  background-color: #f0f7ff;
+  background-color: var(--secondary-color);
   border-radius: 4px;
   display: inline-block;
+  transition: background-color 0.3s ease;
 }
 
 .login-status {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.7;
   margin-top: 0.25rem;
 }
 
@@ -199,11 +207,7 @@ onMounted(async () => {
   
   .action-buttons {
     flex-direction: column;
-  }
-  
-  .add-button, .view-button {
-    width: 100%;
-    text-align: center;
+    align-items: center;
   }
 }
 </style> 

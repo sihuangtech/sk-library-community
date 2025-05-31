@@ -30,7 +30,9 @@
           <div class="book-status">
             <p v-if="book.borrowedBy">
               借阅状态：已借出
-              <span v-if="book.borrowedBy">借阅人：{{ book.borrowedBy }}</span>
+              <span v-if="book.borrowedBy">借阅人：{{ book.borrowedBy }}
+                <span v-if="book.borrowerPhone">（{{ book.borrowerPhone }}）</span>
+              </span>
               <span v-if="book.borrowedAt">借阅时间：{{ formatDate(book.borrowedAt) }}</span>
               <span v-if="book.returnDate">预计归还：{{ formatDate(book.returnDate) }}</span>
             </p>
@@ -213,14 +215,25 @@ async function borrowBook() {
   try {
     // 弹出输入框，让用户输入借阅人姓名
     const borrower = prompt('请输入借阅人姓名:')
-    
     if (!borrower) return // 用户取消
+    
+    // 弹出输入框，让用户输入手机号
+    const borrowerPhone = prompt('请输入借阅人手机号:')
+    if (!borrowerPhone) return // 用户取消
+    
+    // 简单的手机号验证
+    const phoneRegex = /^1[3-9]\d{9}$/
+    if (!phoneRegex.test(borrowerPhone.trim())) {
+      message.error('请输入正确的手机号格式')
+      return
+    }
     
     // 调用API更新图书状态
     await $fetch(`/api/books/${book.value.id}`, {
       method: 'PUT',
       body: {
-        borrowedBy: borrower,
+        borrowedBy: borrower.trim(),
+        borrowerPhone: borrowerPhone.trim(),
         borrowedAt: new Date(),
         // 默认借期为30天
         returnDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
@@ -244,6 +257,7 @@ async function returnBook() {
       method: 'PUT',
       body: {
         borrowedBy: null,
+        borrowerPhone: null,
         borrowedAt: null,
         returnDate: null
       }

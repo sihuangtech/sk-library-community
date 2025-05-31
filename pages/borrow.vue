@@ -41,7 +41,9 @@
           <div class="book-info">
             <h3>{{ book.title }}</h3>
             <p v-if="book.author"><strong>作者：</strong>{{ book.author }}</p>
-            <p v-if="book.borrowedBy"><strong>借阅人：</strong>{{ book.borrowedBy }}</p>
+            <p v-if="book.borrowedBy"><strong>借阅人：</strong>{{ book.borrowedBy }}
+              <span v-if="book.borrowerPhone">（{{ book.borrowerPhone }}）</span>
+            </p>
             <p v-if="book.borrowedAt">
               <strong>借出日期：</strong>{{ formatDate(book.borrowedAt) }}
             </p>
@@ -95,7 +97,12 @@
         
         <div class="form-group">
           <label for="borrower">借阅人姓名：</label>
-          <input v-model="borrower" type="text" id="borrower" />
+          <input v-model="borrower" type="text" id="borrower" placeholder="请输入借阅人姓名" />
+        </div>
+        
+        <div class="form-group">
+          <label for="borrowerPhone">借阅人手机号：</label>
+          <input v-model="borrowerPhone" type="tel" id="borrowerPhone" placeholder="请输入手机号" />
         </div>
         
         <div class="form-group">
@@ -114,6 +121,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useMessage } from '~/composables/useMessage'
+
+// 使用消息服务
+const message = useMessage()
 
 // 定义图书数据类型
 interface Book {
@@ -131,6 +142,7 @@ interface Book {
   borrowedBy?: string | null;
   borrowedAt?: string | null;
   returnDate?: string | null;
+  borrowerPhone?: string | null;
 }
 
 // 状态管理
@@ -143,6 +155,7 @@ const activeTab = ref('borrowed')
 const showBorrowDialog = ref(false)
 const selectedBook = ref<Book | null>(null)
 const borrower = ref('')
+const borrowerPhone = ref('')
 const returnDate = ref('')
 
 // 计算属性：已借出和可借阅的图书
@@ -203,6 +216,7 @@ const isOverdue = (dateString: string) => {
 const openBorrowDialog = (book: Book) => {
   selectedBook.value = book
   borrower.value = ''
+  borrowerPhone.value = ''
   
   // 设置默认归还日期为30天后
   const date = new Date()
@@ -220,13 +234,24 @@ const closeBorrowDialog = () => {
 
 // 借出图书
 const borrowBook = async () => {
-  if (!selectedBook.value || !borrower.value.trim() || !returnDate.value) {
-    alert('请填写完整信息')
+  if (!selectedBook.value || !borrower.value.trim() || !borrowerPhone.value.trim() || !returnDate.value) {
+    message.warning('请填写完整信息（姓名、手机号、归还日期）')
+    return
+  }
+  
+  // 简单的手机号验证
+  const phoneRegex = /^1[3-9]\d{9}$/
+  if (!phoneRegex.test(borrowerPhone.value.trim())) {
+    message.warning('请输入正确的手机号格式')
     return
   }
   
   try {
     isLoading.value = true
+    
+    // 保存图书信息，避免在closeBorrowDialog后访问null值
+    const bookTitle = selectedBook.value.title
+    const borrowerName = borrower.value.trim()
     
     const response = await fetch(`/api/books/${selectedBook.value.id}`, {
       method: 'PUT',
@@ -234,7 +259,8 @@ const borrowBook = async () => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        borrowedBy: borrower.value,
+        borrowedBy: borrowerName,
+        borrowerPhone: borrowerPhone.value.trim(),
         borrowedAt: new Date().toISOString(),
         returnDate: new Date(returnDate.value).toISOString()
       })
@@ -246,9 +272,10 @@ const borrowBook = async () => {
     
     closeBorrowDialog()
     await fetchBooks()
-    alert(`成功借出《${selectedBook.value.title}》给 ${borrower.value}`)
+    message.success(`成功借出《${bookTitle}》给 ${borrowerName}`)
   } catch (err: Error | unknown) {
     error.value = err instanceof Error ? err.message : '借出图书失败，请稍后再试'
+    message.error(`借出失败: ${err instanceof Error ? err.message : '未知错误'}`)
     console.error('借出图书错误:', err)
   } finally {
     isLoading.value = false
@@ -257,7 +284,8 @@ const borrowBook = async () => {
 
 // 归还图书
 const returnBook = async (id: number) => {
-  if (!confirm('确定要归还此图书吗？')) {
+  const confirmed = await message.confirm('确定要归还此图书吗？')
+  if (!confirmed) {
     return
   }
   
@@ -271,6 +299,7 @@ const returnBook = async (id: number) => {
       },
       body: JSON.stringify({
         borrowedBy: null,
+        borrowerPhone: null,
         borrowedAt: null,
         returnDate: null
       })
@@ -281,9 +310,10 @@ const returnBook = async (id: number) => {
     }
     
     await fetchBooks()
-    alert('图书归还成功')
+    message.success('图书归还成功')
   } catch (err: Error | unknown) {
     error.value = err instanceof Error ? err.message : '归还图书失败，请稍后再试'
+    message.error(`归还失败: ${err instanceof Error ? err.message : '未知错误'}`)
     console.error('归还图书错误:', err)
   } finally {
     isLoading.value = false
@@ -299,7 +329,7 @@ const returnBook = async (id: number) => {
 }
 
 h1 {
-  color: #4361ee;
+  color: var(--primary-color);
   margin-bottom: 1.5rem;
   font-size: 2rem;
   text-align: center;
@@ -309,7 +339,7 @@ h1 {
   display: flex;
   justify-content: center;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .tabs button {
@@ -320,14 +350,16 @@ h1 {
   margin: 0 0.5rem;
   font-size: 1rem;
   font-weight: 500;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.7;
   cursor: pointer;
-  transition: border-color 0.3s, color 0.3s;
+  transition: border-color 0.3s, color 0.3s, opacity 0.3s;
 }
 
 .tabs button.active {
-  border-bottom-color: #4361ee;
-  color: #4361ee;
+  border-bottom-color: var(--primary-color);
+  color: var(--primary-color);
+  opacity: 1;
 }
 
 .book-section {
@@ -335,7 +367,7 @@ h1 {
 }
 
 h2 {
-  color: #4361ee;
+  color: var(--primary-color);
   margin-bottom: 1rem;
   font-size: 1.5rem;
 }
@@ -360,9 +392,10 @@ h2 {
 }
 
 .empty-state {
-  background-color: #f9f9f9;
-  border: 1px solid #eee;
-  color: #666;
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  opacity: 0.7;
 }
 
 .book-list {
@@ -372,13 +405,14 @@ h2 {
 }
 
 .book-card {
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
+  transition: background-color 0.3s ease;
 }
 
 .book-info {
@@ -388,22 +422,26 @@ h2 {
 .book-info h3 {
   font-size: 1.2rem;
   margin-bottom: 0.75rem;
-  color: #333;
+  color: var(--text-color);
 }
 
 .book-info p {
   margin-bottom: 0.5rem;
   font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 .overdue {
   color: #f87171;
   font-weight: bold;
+  opacity: 1;
 }
 
 .available {
   color: #10b981;
   font-weight: bold;
+  opacity: 1;
 }
 
 .actions {
@@ -455,22 +493,24 @@ h2 {
 }
 
 .dialog {
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
   padding: 1.5rem;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease;
 }
 
 .dialog h3 {
   margin-bottom: 0.5rem;
-  color: #4361ee;
+  color: var(--primary-color);
 }
 
 .dialog p {
   margin-bottom: 1rem;
   font-weight: bold;
+  color: var(--text-color);
 }
 
 .form-group {
@@ -480,15 +520,19 @@ h2 {
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #555;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 1rem;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 .dialog-actions {
@@ -507,8 +551,8 @@ h2 {
 }
 
 .cancel-button {
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
 }
 
 .confirm-button {

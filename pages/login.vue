@@ -109,30 +109,33 @@ onMounted(async () => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: var(--bg-color);
+  transition: background-color 0.3s ease;
 }
 
 .login-form {
   width: 100%;
   max-width: 400px;
   padding: 2rem;
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
+  transition: background-color 0.3s ease;
 }
 
 h1 {
   font-size: 1.5rem;
   text-align: center;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--text-color);
 }
 
 h2 {
   font-size: 1.2rem;
   text-align: center;
   margin-bottom: 1.5rem;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.7;
 }
 
 .form-group {
@@ -143,26 +146,30 @@ label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  color: var(--text-color);
 }
 
 input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 1rem;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  transition: border-color 0.3s ease, background-color 0.3s ease;
 }
 
 input:focus {
   outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
 }
 
 .login-button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #4a90e2;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
@@ -172,7 +179,7 @@ input:focus {
 }
 
 .login-button:hover {
-  background-color: #3a80d2;
+  background-color: #3a56d4;
 }
 
 .login-button:disabled {

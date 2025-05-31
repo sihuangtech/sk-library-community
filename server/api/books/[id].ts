@@ -1,8 +1,5 @@
-// 引入Prisma客户端
-import { PrismaClient } from '@prisma/client'
-
-// 初始化Prisma客户端
-const prisma = new PrismaClient()
+import { loadConfig } from '~/utils/config'
+import prisma from '~/utils/prisma'
 
 // 定义处理单本图书的API
 export default defineEventHandler(async (event) => {
