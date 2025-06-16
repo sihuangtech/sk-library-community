@@ -21,6 +21,37 @@
           </select>
           <button @click="openCategoryDialog" class="category-manage-button">管理分类</button>
         </div>
+
+        <!-- 排序选择器 -->
+        <div class="sort-filter">
+          <select v-model="sortBy" @change="sortBooks">
+            <option value="addedAt">按添加时间</option>
+            <option value="title">按书名</option>
+            <option value="author">按作者</option>
+            <option value="price">按价格</option>
+            <option value="custom">自定义排序</option>
+          </select>
+          <button 
+            @click="toggleSortOrder" 
+            class="sort-order-button"
+            :title="sortOrder === 'asc' ? '升序' : '降序'"
+          >
+            {{ sortOrder === 'asc' ? '↑' : '↓' }}
+          </button>
+        </div>
+      </div>
+      
+      <!-- 价格汇总信息 -->
+      <div class="price-summary">
+        <span class="summary-item">
+          <strong>图书总数：</strong>{{ filteredBooks.length }}本
+        </span>
+        <span class="summary-item">
+          <strong>总价值：</strong>{{ formatPrice(totalPrice) }}
+        </span>
+        <span v-if="selectedCategoryId !== 'all'" class="summary-item">
+          <strong>当前分类总价值：</strong>{{ formatPrice(categoryTotalPrice) }}
+        </span>
       </div>
       
       <div class="layout-switcher">
@@ -61,105 +92,58 @@
     
     <!-- 列表布局 -->
     <div v-if="!isLoading && filteredBooks.length > 0 && layout === 'list'" class="books-list">
-      <div v-for="book in filteredBooks" :key="book.id" class="book-list-item">
-        <div class="book-cover-small">
-          <img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.title" />
-          <div v-else class="no-cover">
-            <span>暂无封面</span>
-          </div>
-        </div>
-        
-        <div class="book-info-list">
-          <h3 class="book-title">{{ book.title }}</h3>
-          <div class="book-details-list">
-            <p v-if="book.author"><strong>作者：</strong>{{ book.author }}</p>
-            <p v-if="book.publisher"><strong>出版社：</strong>{{ book.publisher }}</p>
-            <p v-if="book.pubdate"><strong>出版日期：</strong>{{ book.pubdate }}</p>
-            <p v-if="book.price"><strong>价格：</strong>{{ formatPrice(book.price) }}</p>
+      <div 
+        ref="sortableListRef"
+        :class="{ 'sortable-enabled': sortBy === 'custom' }"
+      >
+        <div 
+          v-for="book in filteredBooks" 
+          :key="book.id" 
+          :data-id="book.id"
+          class="book-list-item"
+          :class="{ 'draggable': sortBy === 'custom' }"
+        >
+          <div v-if="sortBy === 'custom'" class="drag-handle">
+            <span class="drag-icon">⋮⋮</span>
           </div>
           
-          <!-- 借阅状态 -->
-          <div class="borrow-status" :class="{ borrowed: book.borrowedBy }">
-            <span v-if="book.borrowedBy">
-              已借出给 {{ book.borrowedBy }}
-              <span v-if="book.borrowerPhone" class="phone-info">（{{ book.borrowerPhone }}）</span>
-            </span>
-            <span v-else>在馆</span>
+          <div class="book-cover-small">
+            <img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.title" />
+            <div v-else class="no-cover">
+              <span>暂无封面</span>
+            </div>
           </div>
           
-          <!-- 分类标签 -->
-          <div v-if="bookCategories[book.id]?.length" class="book-categories">
-            <span v-for="category in bookCategories[book.id]" :key="category.id" class="category-tag">
-              {{ category.name }}
-              <button @click.stop="removeBookFromCategory(book.id, category.id)" class="remove-tag">×</button>
-            </span>
-            <button @click="openAddCategoryDialog(book)" class="add-category-button">+</button>
-          </div>
-          <div v-else class="book-categories">
-            <button @click="openAddCategoryDialog(book)" class="add-category-button">添加分类</button>
-          </div>
-        </div>
-        
-        <div class="actions-list">
-          <button @click="viewBookDetails(book.id)" class="view-button">详情</button>
-          <button 
-            v-if="!book.borrowedBy" 
-            @click="openBorrowDialog(book)" 
-            class="borrow-button"
-          >
-            借出
-          </button>
-          <button 
-            v-else 
-            @click="returnBook(book.id)" 
-            class="return-button"
-          >
-            归还
-          </button>
-          <button @click="editBook(book.id)" class="edit-button">编辑</button>
-          <button @click="confirmDeleteBook(book)" class="delete-button">删除</button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 网格布局 -->
-    <div v-if="!isLoading && filteredBooks.length > 0 && layout === 'grid'" class="books-grid">
-      <div v-for="book in filteredBooks" :key="book.id" class="book-card">
-        <div class="book-cover">
-          <img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.title" />
-          <div v-else class="no-cover">
-            <span>暂无封面</span>
-          </div>
-        </div>
-        
-        <div class="book-info">
-          <h3 class="book-title">{{ book.title }}</h3>
-          <p v-if="book.author"><strong>作者：</strong>{{ book.author }}</p>
-          <p v-if="book.publisher"><strong>出版社：</strong>{{ book.publisher }}</p>
-          <p v-if="book.price"><strong>价格：</strong>{{ formatPrice(book.price) }}</p>
-          
-          <!-- 借阅状态 -->
-          <div class="borrow-status" :class="{ borrowed: book.borrowedBy }">
-            <span v-if="book.borrowedBy">
-              已借出给 {{ book.borrowedBy }}
-              <span v-if="book.borrowerPhone" class="phone-info">（{{ book.borrowerPhone }}）</span>
-            </span>
-            <span v-else>在馆</span>
+          <div class="book-info-list">
+            <h3 class="book-title">{{ book.title }}</h3>
+            <div class="book-details-list">
+              <p v-if="book.author"><strong>作者：</strong>{{ book.author }}</p>
+              <p v-if="book.publisher"><strong>出版社：</strong>{{ book.publisher }}</p>
+              <p v-if="book.pubdate"><strong>出版日期：</strong>{{ book.pubdate }}</p>
+              <p v-if="book.price"><strong>价格：</strong>{{ formatPrice(book.price) }}</p>
+            </div>
+            
+            <!-- 借阅状态和分类标签 -->
+            <div class="status-and-categories">
+              <div class="borrow-status" :class="{ borrowed: book.borrowedBy }">
+                <span v-if="book.borrowedBy">已借出</span>
+                <span v-else>可借</span>
+              </div>
+              
+              <div v-if="bookCategories[book.id]?.length" class="book-categories">
+                <span v-for="category in bookCategories[book.id]" :key="category.id" class="category-tag">
+                  {{ category.name }}
+                  <button @click.stop="removeBookFromCategory(book.id, category.id)" class="remove-tag">×</button>
+                </span>
+                <button @click="openAddCategoryDialog(book)" class="add-category-button">+</button>
+              </div>
+              <div v-else class="book-categories">
+                <button @click="openAddCategoryDialog(book)" class="add-category-button">添加分类</button>
+              </div>
+            </div>
           </div>
           
-          <!-- 分类标签 -->
-          <div v-if="bookCategories[book.id]?.length" class="book-categories">
-            <span v-for="category in bookCategories[book.id]" :key="category.id" class="category-tag">
-              {{ category.name }}
-              <button @click.stop="removeBookFromCategory(book.id, category.id)" class="remove-tag">×</button>
-            </span>
-            <button @click="openAddCategoryDialog(book)" class="add-category-button">+</button>
-          </div>
-          <div v-else class="book-categories">
-            <button @click="openAddCategoryDialog(book)" class="add-category-button">添加分类</button>
-          </div>
-          
-          <div class="actions">
+          <div class="actions-list">
             <button @click="viewBookDetails(book.id)" class="view-button">详情</button>
             <button 
               v-if="!book.borrowedBy" 
@@ -180,6 +164,79 @@
           </div>
         </div>
       </div>
+    </div>
+    
+    <!-- 网格布局 -->
+    <div 
+      v-if="!isLoading && filteredBooks.length > 0 && layout === 'grid'" 
+      ref="sortableGridRef"
+      :class="{ 'sortable-enabled': sortBy === 'custom' }"
+      class="books-grid"
+    >
+        <div 
+          v-for="book in filteredBooks" 
+          :key="book.id" 
+          :data-id="book.id"
+          class="book-card"
+          :class="{ 'draggable': sortBy === 'custom' }"
+        >
+          <div v-if="sortBy === 'custom'" class="drag-handle">
+            <span class="drag-icon">⋮⋮</span>
+          </div>
+          
+          <div class="book-cover">
+            <img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.title" />
+            <div v-else class="no-cover">
+              <span>暂无封面</span>
+            </div>
+          </div>
+          
+          <div class="book-info">
+            <h3 class="book-title">{{ book.title }}</h3>
+            <p v-if="book.author"><strong>作者：</strong>{{ book.author }}</p>
+            <p v-if="book.publisher"><strong>出版社：</strong>{{ book.publisher }}</p>
+            <p v-if="book.price"><strong>价格：</strong>{{ formatPrice(book.price) }}</p>
+            
+            <!-- 借阅状态和分类标签 -->
+            <div class="status-and-categories">
+              <div class="borrow-status" :class="{ borrowed: book.borrowedBy }">
+                <span v-if="book.borrowedBy">已借出</span>
+                <span v-else>可借</span>
+              </div>
+              
+              <div v-if="bookCategories[book.id]?.length" class="book-categories">
+                <span v-for="category in bookCategories[book.id]" :key="category.id" class="category-tag">
+                  {{ category.name }}
+                  <button @click.stop="removeBookFromCategory(book.id, category.id)" class="remove-tag">×</button>
+                </span>
+                <button @click="openAddCategoryDialog(book)" class="add-category-button">+</button>
+              </div>
+              <div v-else class="book-categories">
+                <button @click="openAddCategoryDialog(book)" class="add-category-button">添加分类</button>
+              </div>
+            </div>
+            
+            <div class="actions">
+              <button @click="viewBookDetails(book.id)" class="view-button">详情</button>
+              <button 
+                v-if="!book.borrowedBy" 
+                @click="openBorrowDialog(book)" 
+                class="borrow-button"
+              >
+                借出
+              </button>
+              <button 
+                v-else 
+                @click="returnBook(book.id)" 
+                class="return-button"
+              >
+                归还
+              </button>
+              <button @click="editBook(book.id)" class="edit-button">编辑</button>
+              <button @click="confirmDeleteBook(book)" class="delete-button">删除</button>
+            </div>
+          </div>
+        </div>
     </div>
     
     <!-- 借出对话框 -->
@@ -289,9 +346,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from '~/composables/useMessage'
+import { formatPrice, parsePrice } from '~/utils/formatPrice'
+import Sortable from 'sortablejs'
 
 // 定义事件发射
 const emit = defineEmits<{
@@ -315,6 +374,7 @@ interface Book {
   borrowedAt?: string | null;
   returnDate?: string | null;
   borrowerPhone?: string | null;
+  sortOrder?: number; // 添加排序字段
 }
 
 // 定义分类数据类型
@@ -339,6 +399,10 @@ const message = useMessage() // 使用消息服务
 
 // 分类筛选状态
 const selectedCategoryId = ref<number | 'all'>('all')
+
+// 排序相关状态
+const sortBy = ref('addedAt') // 排序字段
+const sortOrder = ref<'asc' | 'desc'>('desc') // 排序顺序
 
 // 借阅相关状态
 const showBorrowDialog = ref(false)
@@ -368,32 +432,26 @@ const availableCategories = computed(() => {
   return categories.value.filter(c => !existingCategoryIds.includes(c.id))
 })
 
-// 格式化价格显示
-const formatPrice = (price: string | number | null | undefined): string => {
-  if (price === null || price === undefined || price === '') return '未知'
-  
-  // 如果已经是格式化的价格字符串，直接返回
-  if (typeof price === 'string') {
-    if (price.includes('¥') || price.includes('￥')) return price
-    
-    // 尝试转换为数字
-    const numPrice = Number(price)
-    if (isNaN(numPrice)) return price // 如果不是数字，直接返回原始字符串
-    
-    // 如果是有效数字，则格式化
-    return `¥${numPrice.toFixed(2)}`
-  }
-  
-  // 处理数字类型的价格
-  if (typeof price === 'number') {
-    if (price > 1000) { // 假设是以分为单位
-      return `¥${(price / 100).toFixed(2)}`
-    }
-    return `¥${price.toFixed(2)}`
-  }
-  
-  return '未知'
-}
+// 拖拽排序相关
+const sortableListRef = ref<HTMLElement | null>(null)
+const sortableGridRef = ref<HTMLElement | null>(null)
+let sortableInstance: Sortable | null = null
+
+// 计算总价值
+const totalPrice = computed(() => {
+  return books.value.reduce((total, book) => {
+    return total + parsePrice(book.price)
+  }, 0)
+})
+
+// 计算当前分类的总价值
+const categoryTotalPrice = computed(() => {
+  return filteredBooks.value.reduce((total, book) => {
+    return total + parsePrice(book.price)
+  }, 0)
+})
+
+
 
 // 页面加载时获取所有图书和分类
 onMounted(async () => {
@@ -473,29 +531,100 @@ const fetchBookCategories = async () => {
 const filterBooks = () => {
   if (selectedCategoryId.value === 'all' && !searchQuery.value.trim()) {
     filteredBooks.value = books.value
-    return
+  } else {
+    // 先按分类筛选
+    let filtered = books.value
+    
+    if (selectedCategoryId.value !== 'all') {
+      filtered = filtered.filter(book => {
+        const bookCats = bookCategories.value[book.id] || []
+        return bookCats.some(cat => cat.id === selectedCategoryId.value)
+      })
+    }
+    
+    // 再按搜索词筛选
+    if (searchQuery.value.trim()) {
+      const query = searchQuery.value.toLowerCase()
+      filtered = filtered.filter(book => 
+        book.title.toLowerCase().includes(query) || 
+        (book.author && book.author.toLowerCase().includes(query))
+      )
+    }
+    
+    filteredBooks.value = filtered
   }
   
-  // 先按分类筛选
-  let filtered = books.value
+  // 应用排序
+  sortBooks()
+}
+
+// 排序图书
+const sortBooks = async () => {
+  const sorted = [...filteredBooks.value]
   
-  if (selectedCategoryId.value !== 'all') {
-    filtered = filtered.filter(book => {
-      const bookCats = bookCategories.value[book.id] || []
-      return bookCats.some(cat => cat.id === selectedCategoryId.value)
-    })
+  switch (sortBy.value) {
+    case 'title':
+      sorted.sort((a, b) => {
+        const comparison = a.title.localeCompare(b.title, 'zh-CN')
+        return sortOrder.value === 'asc' ? comparison : -comparison
+      })
+      break
+    case 'author':
+      sorted.sort((a, b) => {
+        const aAuthor = a.author || ''
+        const bAuthor = b.author || ''
+        const comparison = aAuthor.localeCompare(bAuthor, 'zh-CN')
+        return sortOrder.value === 'asc' ? comparison : -comparison
+      })
+      break
+    case 'price':
+      sorted.sort((a, b) => {
+        const aPrice = parseFloat(a.price || '0')
+        const bPrice = parseFloat(b.price || '0')
+        const comparison = aPrice - bPrice
+        return sortOrder.value === 'asc' ? comparison : -comparison
+      })
+      break
+    case 'addedAt':
+      sorted.sort((a, b) => {
+        const aDate = new Date(a.addedAt).getTime()
+        const bDate = new Date(b.addedAt).getTime()
+        const comparison = aDate - bDate
+        return sortOrder.value === 'asc' ? comparison : -comparison
+      })
+      break
+    case 'custom':
+      // 自定义排序：按sortOrder字段排序，如果没有则按添加时间
+      sorted.sort((a, b) => {
+        const aSortOrder = a.sortOrder || 999999
+        const bSortOrder = b.sortOrder || 999999
+        if (aSortOrder !== bSortOrder) {
+          return aSortOrder - bSortOrder
+        }
+        // 如果sortOrder相同，按添加时间排序
+        const aDate = new Date(a.addedAt).getTime()
+        const bDate = new Date(b.addedAt).getTime()
+        return aDate - bDate
+      })
+      break
   }
   
-  // 再按搜索词筛选
-  if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(book => 
-      book.title.toLowerCase().includes(query) || 
-      (book.author && book.author.toLowerCase().includes(query))
-    )
-  }
+  filteredBooks.value = sorted
   
-  filteredBooks.value = filtered
+  // 如果是自定义排序，初始化拖拽功能
+  if (sortBy.value === 'custom') {
+    await initSortable()
+  } else if (sortableInstance) {
+    // 如果不是自定义排序，销毁拖拽实例
+    sortableInstance.destroy()
+    sortableInstance = null
+  }
+}
+
+// 切换排序顺序
+const toggleSortOrder = () => {
+  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  sortBooks()
 }
 
 // 按分类筛选图书
@@ -878,6 +1007,68 @@ const removeBookFromCategory = async (bookId: number, categoryId: number) => {
     isLoading.value = false
   }
 }
+
+// 初始化拖拽排序
+const initSortable = async () => {
+  if (sortBy.value !== 'custom') return
+  
+  await nextTick()
+  
+  const container = layout.value === 'list' ? sortableListRef.value : sortableGridRef.value
+  if (!container) return
+  
+  // 销毁现有实例
+  if (sortableInstance) {
+    sortableInstance.destroy()
+  }
+  
+  sortableInstance = Sortable.create(container, {
+    animation: 150,
+    handle: '.drag-handle',
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    dragClass: 'sortable-drag',
+    onEnd: async (evt) => {
+      if (evt.oldIndex !== evt.newIndex) {
+        await updateSortOrder(evt.oldIndex!, evt.newIndex!)
+      }
+    }
+  })
+}
+
+// 更新排序顺序
+const updateSortOrder = async (oldIndex: number, newIndex: number) => {
+  try {
+    // 重新排列本地数组
+    const items = [...filteredBooks.value]
+    const [movedItem] = items.splice(oldIndex, 1)
+    items.splice(newIndex, 0, movedItem)
+    
+    // 更新sortOrder值
+    const updates = items.map((book, index) => ({
+      id: book.id,
+      sortOrder: index + 1
+    }))
+    
+    // 发送到服务器
+    await fetch('/api/books/sort', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ books: updates })
+    })
+    
+    // 重新获取数据
+    await fetchBooks()
+    message.success('排序已更新')
+  } catch (error) {
+    console.error('更新排序失败:', error)
+    message.error('更新排序失败')
+    // 重新获取数据以恢复原始顺序
+    await fetchBooks()
+  }
+}
 </script>
 
 <style scoped>
@@ -940,13 +1131,68 @@ h2 {
 }
 
 .category-manage-button {
-  padding: 0.75rem;
-  background-color: #10b981;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
+  margin-left: 0.1rem;
+}
+
+.sort-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-filter select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.sort-order-button {
+  padding: 0.5rem;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  min-width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sort-order-button:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.price-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.summary-item {
+  color: var(--text-color);
+}
+
+.summary-item strong {
+  color: var(--primary-color);
 }
 
 .layout-switcher {
@@ -1013,7 +1259,7 @@ h2 {
 .books-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .book-list-item {
@@ -1066,11 +1312,20 @@ h2 {
   opacity: 0.8;
 }
 
+.status-and-categories {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: nowrap;
+}
+
 .book-categories {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
-  margin-top: 10px;
+  overflow-x: auto;
+  flex: 1;
 }
 
 .category-tag {
@@ -1105,58 +1360,139 @@ h2 {
 }
 
 .actions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  padding: 0.8rem;
   justify-content: center;
 }
 
 .view-button, .borrow-button, .return-button, .edit-button, .delete-button {
   flex: 1;
-  padding: 0.6rem;
+  padding: 0.3rem 0.8rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
   font-size: 0.85rem;
   text-align: center;
+  min-height: 32px;
 }
 
 .view-button {
-  background-color: #4361ee;
-  color: white;
-}
-
-.borrow-button, .edit-button {
   background-color: #10b981;
   color: white;
 }
 
-.return-button, .delete-button {
+.borrow-button {
+  background-color: #4361ee;
+  color: white;
+}
+
+.edit-button {
   background-color: #f59e0b;
+  color: white;
+}
+
+.return-button {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.delete-button {
+  background-color: #ef4444;
   color: white;
 }
 
 .books-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
+  gap: 24px;
+  margin-top: 20px;
 }
+
+
 
 .book-card {
   background-color: var(--card-bg);
   border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  box-shadow: var(--shadow);
-  transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s ease;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
   display: flex;
   flex-direction: column;
 }
 
 .book-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.book-card.draggable {
+  cursor: move;
+}
+
+.drag-handle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 4px;
+  padding: 4px 6px;
+  cursor: grab;
+  font-size: 12px;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-icon {
+  font-weight: bold;
+  letter-spacing: -1px;
+}
+
+.sortable-ghost {
+  opacity: 0.5;
+  background-color: #f0f0f0;
+}
+
+.sortable-chosen {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.sortable-drag {
+  transform: rotate(5deg);
+  opacity: 0.8;
+}
+
+.book-list-item.draggable {
+  cursor: move;
+  position: relative;
+}
+
+.book-list-item .drag-handle {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 4px;
+  padding: 8px 6px;
+  cursor: grab;
+  font-size: 12px;
+  user-select: none;
+}
+
+.book-list-item.draggable .book-cover-small {
+  margin-left: 40px;
 }
 
 .book-cover {
@@ -1207,25 +1543,27 @@ h2 {
 }
 
 .borrow-status {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
+  padding: 0.3rem 0.6rem;
   border-radius: 4px;
-  font-size: 0.85rem;
-  background-color: #e6f7ff;
-  color: #1890ff;
+  font-size: 0.8rem;
+  background-color: #f6ffed;
+  color: #52c41a;
   text-align: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .borrow-status.borrowed {
-  background-color: #fff7e6;
-  color: #fa8c16;
+  background-color: #fff1f0;
+  color: #ff4d4f;
 }
 
 .actions {
-  display: flex;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
   margin-top: auto;
-  flex-wrap: wrap;
+  padding: 0.8rem;
 }
 
 .dialog-overlay {
@@ -1415,6 +1753,7 @@ h2 {
   .filter-group {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
   }
   
   .search-box {
@@ -1423,6 +1762,24 @@ h2 {
   
   .category-filter {
     width: 100%;
+  }
+  
+  .sort-filter {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .sort-filter select {
+    flex: 1;
+    margin-right: 0.5rem;
+  }
+  
+  .price-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    font-size: 0.8rem;
   }
   
   .category-dialog {
@@ -1438,18 +1795,40 @@ h2 {
     flex-direction: column;
   }
   
+  .book-list-item.draggable .book-cover-small {
+    margin-left: 0;
+  }
+  
+  .book-list-item .drag-handle {
+    position: static;
+    transform: none;
+    margin-bottom: 0.5rem;
+    align-self: flex-start;
+  }
+  
   .book-cover-small {
     width: 100%;
     height: 200px;
   }
   
   .actions-list {
-    flex-direction: row;
-    flex-wrap: wrap;
+    grid-template-columns: 1fr 1fr;
   }
   
   .view-button, .borrow-button, .return-button, .edit-button, .delete-button {
-    flex: 1 0 40%;
+    min-width: 0;
+  }
+  
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+  }
+  
+  .book-card .drag-handle {
+    top: 4px;
+    right: 4px;
+    padding: 2px 4px;
+    font-size: 10px;
   }
 }
 </style> 

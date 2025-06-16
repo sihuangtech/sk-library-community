@@ -43,6 +43,7 @@ model Book {
   clcCode     String?  // 中图分类号
   clcName     String?  // 分类名称
   pictures    String?  // 图片列表 (JSON字符串)
+  sortOrder   Int?     // 全局排序顺序，用于自定义排序
   
   addedAt     DateTime @default(now()) // 添加时间
   borrowedBy  String?  // 借阅人姓名
@@ -60,6 +61,7 @@ model BookCategory {
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade) // 级联删除
   categoryId Int
   addedAt    DateTime @default(now()) // 添加到分类的时间
+  sortOrder  Int?     // 在该分类内的排序顺序
 
   @@id([bookId, categoryId]) // 复合主键
 } 

@@ -125,7 +125,7 @@
         </div>
         <div class="info-item">
           <span class="label">运行环境：</span>
-          <span class="value">{{ systemInfo.environment }}</span>
+          <span class="value">{{ getEnvironmentText(systemInfo.environment) }}</span>
         </div>
         <div class="info-item">
           <span class="label">启动时间：</span>
@@ -134,6 +134,63 @@
         <div class="info-item">
           <span class="label">Node.js版本：</span>
           <span class="value">{{ systemInfo.nodeVersion }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Nuxt版本：</span>
+          <span class="value">{{ systemInfo.nuxtVersion }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Vue版本：</span>
+          <span class="value">{{ systemInfo.vueVersion }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Prisma版本：</span>
+          <span class="value">{{ systemInfo.prismaVersion }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">TypeScript版本：</span>
+          <span class="value">{{ systemInfo.typescriptVersion }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">运行时长：</span>
+          <span class="value">{{ getUptime(systemInfo.startTime) }}</span>
+        </div>
+        <div class="info-item memory-info">
+          <span class="label">内存使用：</span>
+          <div class="memory-container">
+            <div class="memory-details">
+              <div class="memory-item">
+                <span class="memory-label">物理内存 (RSS)：</span>
+                <span class="memory-value">{{ systemInfo.memoryUsage.rss }}</span>
+              </div>
+              <div class="memory-item">
+                <span class="memory-label">堆内存已用：</span>
+                <span class="memory-value">{{ systemInfo.memoryUsage.heapUsed }}</span>
+              </div>
+              <div class="memory-item">
+                <span class="memory-label">堆内存总计：</span>
+                <span class="memory-value">{{ systemInfo.memoryUsage.heapTotal }}</span>
+              </div>
+              <div class="memory-item">
+                <span class="memory-label">外部内存：</span>
+                <span class="memory-value">{{ systemInfo.memoryUsage.external }}</span>
+              </div>
+            </div>
+            <div class="memory-explanation">
+              <div class="explanation-title"><strong>说明：</strong></div>
+              <div class="explanation-item">物理内存是进程实际占用的系统内存</div>
+              <div class="explanation-item">堆内存是JavaScript对象使用的内存</div>
+              <div class="explanation-item">外部内存是C++对象使用的内存</div>
+            </div>
+          </div>
+        </div>
+        <div class="info-item">
+          <span class="label">平台信息：</span>
+          <span class="value">{{ systemInfo.platform }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">CPU架构：</span>
+          <span class="value">{{ systemInfo.arch }}</span>
         </div>
       </div>
     </div>
@@ -191,7 +248,19 @@ const systemInfo = ref({
   version: '1.0.0',
   environment: 'development',
   startTime: new Date().toISOString(),
-  nodeVersion: ''
+  nodeVersion: '',
+  nuxtVersion: '',
+  vueVersion: '',
+  prismaVersion: '',
+  typescriptVersion: '',
+  memoryUsage: {
+    rss: '0 MB',
+    heapUsed: '0 MB',
+    heapTotal: '0 MB',
+    external: '0 MB'
+  },
+  platform: '',
+  arch: ''
 })
 
 // 加载状态
@@ -204,6 +273,36 @@ const showBackupDialog = ref(false)
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
   return date.toLocaleString('zh-CN')
+}
+
+// 获取环境文本（中文显示）
+const getEnvironmentText = (env: string) => {
+  const envMap: Record<string, string> = {
+    'development': '开发模式',
+    'production': '生产模式',
+    'test': '测试模式',
+    'staging': '预发布模式'
+  }
+  return envMap[env] || env
+}
+
+// 计算运行时长
+const getUptime = (startTime: string) => {
+  const start = new Date(startTime)
+  const now = new Date()
+  const diff = now.getTime() - start.getTime()
+  
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  
+  if (days > 0) {
+    return `${days}天 ${hours}小时 ${minutes}分钟`
+  } else if (hours > 0) {
+    return `${hours}小时 ${minutes}分钟`
+  } else {
+    return `${minutes}分钟`
+  }
 }
 
 // 检查数据库状态
@@ -664,6 +763,76 @@ input:checked + .slider:before {
   gap: 1rem;
 }
 
+/* 内存信息样式 */
+.memory-info {
+  flex-direction: column;
+  align-items: flex-start !important;
+}
+
+.memory-container {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.memory-details {
+  flex: 2;
+  min-width: 300px;
+}
+
+.memory-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.memory-item:last-child {
+  border-bottom: none;
+}
+
+.memory-label {
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.memory-value {
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.9rem;
+}
+
+.memory-explanation {
+  flex: 1.5;
+  padding: 0.75rem;
+  background-color: var(--secondary-color);
+  border-radius: 4px;
+  border-left: 3px solid var(--primary-color);
+  min-width: 320px;
+  max-width: 450px;
+}
+
+.explanation-title {
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.explanation-item {
+  color: var(--text-color);
+  opacity: 0.8;
+  line-height: 1.5;
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.explanation-item:last-child {
+  margin-bottom: 0;
+}
+
 /* 对话框样式 */
 .dialog-overlay {
   position: fixed;
@@ -755,6 +924,15 @@ input:checked + .slider:before {
   
   .system-info {
     grid-template-columns: 1fr;
+  }
+  
+  .memory-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .memory-explanation {
+    min-width: auto;
   }
 }
 

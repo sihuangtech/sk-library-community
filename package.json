@@ -29,6 +29,7 @@
     "@nuxt/test-utils": "^3.19.0",
     "@prisma/client": "^6.8.2",
     "@types/js-yaml": "^4.0.9",
+    "@types/sortablejs": "^1.15.8",
     "@unhead/vue": "^2.0.9",
     "@vue/compiler-sfc": "^3.5.14",
     "cross-env": "^7.0.3",
@@ -36,6 +37,7 @@
     "js-yaml": "^4.1.0",
     "nuxt": "^3.17.3",
     "prisma": "^6.8.2",
+    "sortablejs": "^1.15.6",
     "typescript": "^5.8.3",
     "vue": "^3.5.14",
     "vue-router": "^4.5.1"

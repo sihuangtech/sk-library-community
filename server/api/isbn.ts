@@ -50,8 +50,8 @@ export default defineEventHandler(async (event) => {
         author: result.data.author,
         publisher: result.data.press,
         pubdate: result.data.pressDate,
-        // 将价格从整数（单位：分）转换为带小数点的字符串（单位：元）
-        price: result.data.price ? String((Number(result.data.price) / 100).toFixed(2)) : null,
+        // 直接保存原始价格数据，不进行单位转换
+        price: result.data.price ? String(result.data.price) : null,
         summary: result.data.bookDesc,
         pages: parseInt(result.data.pages) || null,
         

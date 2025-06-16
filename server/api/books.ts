@@ -31,16 +31,8 @@ export default defineEventHandler(async (event) => {
   if (method === 'POST') {
     const body = await readBody(event)
     
-    // 处理价格：如果是大于100的整数，假定它是以分为单位，转换为元并格式化
-    if (body.price !== null && body.price !== undefined) {
-      const priceNum = Number(body.price)
-      if (!isNaN(priceNum) && priceNum > 100) { // 可能是以分为单位
-        body.price = (priceNum / 100).toFixed(2)
-      } else if (!isNaN(priceNum)) {
-        body.price = priceNum.toFixed(2)
-      }
-      // 如果已经是字符串格式且包含小数点，则保持不变
-    }
+    // 移除价格自动转换逻辑，直接保存原始价格
+    // 价格格式化将在前端处理
     
     try {
       const newBook = await prisma.book.create({

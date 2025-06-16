@@ -10,7 +10,7 @@ site:
   # 网站名称
   name: "家庭图书管理系统"
   # 版本号
-  version: "1.0.0"
+  version: "1.1.0"
   # 版权所有者
   copyright_owner: "彩旗工作室"
   

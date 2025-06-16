@@ -130,6 +130,7 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useMessage } from '~/composables/useMessage'
+import { formatPrice } from '~/utils/formatPrice'
 
 const route = useRoute()
 const router = useRouter()
@@ -173,29 +174,6 @@ const parsePictures = computed(() => {
     return []
   }
 })
-
-// 格式化价格
-function formatPrice(price) {
-  if (!price) return '未知'
-  
-  // 如果price是数字且以分为单位（如5980表示59.80元）
-  if (typeof price === 'number') {
-    return `¥${(price / 100).toFixed(2)}`
-  }
-  
-  // 如果price是字符串但可以转换为数字
-  if (typeof price === 'string' && !isNaN(Number(price))) {
-    const numPrice = Number(price)
-    // 判断是否需要除以100（根据大小判断）
-    if (numPrice > 1000) { // 可能是以分为单位
-      return `¥${(numPrice / 100).toFixed(2)}`
-    }
-    return `¥${numPrice.toFixed(2)}`
-  }
-  
-  // 如果price已经是格式化的字符串
-  return price.includes('¥') ? price : `¥${price}`
-}
 
 // 格式化日期
 function formatDate(dateStr) {

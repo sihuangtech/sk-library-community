@@ -1,0 +1,1 @@
+const { execSync } = require('child_process'); const version = execSync('cmd /c ver', { encoding: 'utf8' }).trim(); console.log('原始输出:', version); const match = version.match(/Microsoft Windows \[(?:Version|版本) ([\d.]+)/); console.log('匹配结果:', match);

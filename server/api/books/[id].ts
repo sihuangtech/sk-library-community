@@ -43,15 +43,14 @@ export default defineEventHandler(async (event) => {
   if (method === 'PUT') {
     const body = await readBody(event)
     
-    // 处理价格：如果是大于100的整数，假定它是以分为单位，转换为元并格式化
-    if (body.price !== null && body.price !== undefined) {
+    // 价格处理：直接保存用户输入的价格，不进行自动转换
+    if (body.price !== null && body.price !== undefined && body.price !== '') {
       const priceNum = Number(body.price)
-      if (!isNaN(priceNum) && priceNum > 100) { // 可能是以分为单位
-        body.price = (priceNum / 100).toFixed(2)
-      } else if (!isNaN(priceNum)) {
-        body.price = priceNum.toFixed(2)
+      if (!isNaN(priceNum)) {
+        // 直接保存数值，保留用户输入的原始值
+        body.price = priceNum.toString()
       }
-      // 如果已经是字符串格式且包含小数点，则保持不变
+      // 如果不是有效数字，保持原始字符串
     }
     
     try {

@@ -201,18 +201,8 @@ async function saveBook() {
       formData.pages = parseInt(formData.pages)
     }
     
-    // 处理价格：确保是格式化的字符串
-    if (formData.price) {
-      const priceNum = Number(formData.price)
-      if (!isNaN(priceNum)) {
-        // 如果价格是大数字，假定是以分为单位
-        if (priceNum > 1000) {
-          formData.price = (priceNum / 100).toFixed(2)
-        } else {
-          formData.price = priceNum.toFixed(2)
-        }
-      }
-    }
+    // 价格直接保存，不进行任何转换
+    // 价格格式化将在前端显示时处理
     
     // 提交到API
     await $fetch(`/api/books/${bookId}`, {

@@ -5,14 +5,13 @@ import prisma from '~/utils/prisma'
 export default defineEventHandler(async (event) => {
   // 获取请求方法
   const method = getMethod(event)
+  const query = getQuery(event)
   
-  // GET 请求 - 获取图书的所有分类或分类下的所有图书
+  // GET 请求 - 获取图书的分类或分类的图书
   if (method === 'GET') {
-    const query = getQuery(event)
-    
-    // 根据bookId获取图书的所有分类
+    // 如果提供了bookId，获取该图书的所有分类
     if (query.bookId) {
-      const bookId = parseInt(query.bookId as string)
+      const bookId = Number(query.bookId)
       
       if (isNaN(bookId)) {
         return createError({
@@ -22,28 +21,15 @@ export default defineEventHandler(async (event) => {
       }
       
       try {
-        // 检查图书是否存在
-        const book = await prisma.book.findUnique({
-          where: { id: bookId }
-        })
-        
-        if (!book) {
-          return createError({
-            statusCode: 404,
-            message: '图书不存在'
-          })
-        }
-        
-        // 获取图书的所有分类
         const bookCategories = await prisma.bookCategory.findMany({
           where: { bookId },
-          include: { category: true }
+          include: {
+            category: true
+          },
+          orderBy: { sortOrder: 'asc' } // 按分类内排序顺序排列
         })
         
-        // 提取分类信息
-        const categories = bookCategories.map(bc => bc.category)
-        
-        return categories
+        return bookCategories.map(bc => bc.category)
       } catch (error) {
         console.error('获取图书分类失败:', error)
         return createError({
@@ -53,9 +39,9 @@ export default defineEventHandler(async (event) => {
       }
     }
     
-    // 根据categoryId获取分类下的所有图书
+    // 如果提供了categoryId，获取该分类的所有图书
     if (query.categoryId) {
-      const categoryId = parseInt(query.categoryId as string)
+      const categoryId = Number(query.categoryId)
       
       if (isNaN(categoryId)) {
         return createError({
@@ -65,28 +51,15 @@ export default defineEventHandler(async (event) => {
       }
       
       try {
-        // 检查分类是否存在
-        const category = await prisma.category.findUnique({
-          where: { id: categoryId }
-        })
-        
-        if (!category) {
-          return createError({
-            statusCode: 404,
-            message: '分类不存在'
-          })
-        }
-        
-        // 获取分类下的所有图书
-        const bookCategories = await prisma.bookCategory.findMany({
+        const categoryBooks = await prisma.bookCategory.findMany({
           where: { categoryId },
-          include: { book: true }
+          include: {
+            book: true
+          },
+          orderBy: { sortOrder: 'asc' } // 按分类内排序顺序排列
         })
         
-        // 提取图书信息
-        const books = bookCategories.map(bc => bc.book)
-        
-        return books
+        return categoryBooks.map(cb => cb.book)
       } catch (error) {
         console.error('获取分类图书失败:', error)
         return createError({
@@ -106,82 +79,31 @@ export default defineEventHandler(async (event) => {
   if (method === 'POST') {
     const body = await readBody(event)
     
-    // 验证请求体中是否包含图书ID和分类ID
     if (!body.bookId || !body.categoryId) {
       return createError({
         statusCode: 400,
-        message: '图书ID和分类ID不能为空'
-      })
-    }
-    
-    const bookId = parseInt(body.bookId)
-    const categoryId = parseInt(body.categoryId)
-    
-    if (isNaN(bookId) || isNaN(categoryId)) {
-      return createError({
-        statusCode: 400,
-        message: '无效的图书ID或分类ID'
+        message: '缺少必要参数：bookId和categoryId'
       })
     }
     
     try {
-      // 检查图书和分类是否存在
-      const book = await prisma.book.findUnique({
-        where: { id: bookId }
+      // 获取该分类中当前最大的sortOrder
+      const maxSortOrder = await prisma.bookCategory.findFirst({
+        where: { categoryId: body.categoryId },
+        orderBy: { sortOrder: 'desc' }
       })
       
-      if (!book) {
-        return createError({
-          statusCode: 404,
-          message: '图书不存在'
-        })
-      }
+      const newSortOrder = (maxSortOrder?.sortOrder || 0) + 1
       
-      const category = await prisma.category.findUnique({
-        where: { id: categoryId }
-      })
-      
-      if (!category) {
-        return createError({
-          statusCode: 404,
-          message: '分类不存在'
-        })
-      }
-      
-      // 检查关联是否已存在
-      const existingRelation = await prisma.bookCategory.findUnique({
-        where: {
-          bookId_categoryId: {
-            bookId,
-            categoryId
-          }
-        }
-      })
-      
-      if (existingRelation) {
-        return createError({
-          statusCode: 400,
-          message: '图书已添加到该分类'
-        })
-      }
-      
-      // 创建图书与分类的关联
       const bookCategory = await prisma.bookCategory.create({
         data: {
-          bookId,
-          categoryId
-        },
-        include: {
-          book: true,
-          category: true
+          bookId: body.bookId,
+          categoryId: body.categoryId,
+          sortOrder: newSortOrder
         }
       })
       
-      return {
-        success: true,
-        message: `已将《${book.title}》添加到"${category.name}"分类`,
-        data: bookCategory
-      }
+      return bookCategory
     } catch (error) {
       console.error('添加图书到分类失败:', error)
       return createError({
@@ -191,64 +113,66 @@ export default defineEventHandler(async (event) => {
     }
   }
   
-  // DELETE 请求 - 从分类中移除图书
-  if (method === 'DELETE') {
+  // PUT 请求 - 更新分类内图书排序
+  if (method === 'PUT') {
     const body = await readBody(event)
     
-    // 验证请求体中是否包含图书ID和分类ID
-    if (!body.bookId || !body.categoryId) {
+    // 期望的数据格式: { categoryId: number, books: [{ bookId: number, sortOrder: number }] }
+    if (!body.categoryId || !body.books || !Array.isArray(body.books)) {
       return createError({
         statusCode: 400,
-        message: '图书ID和分类ID不能为空'
-      })
-    }
-    
-    const bookId = parseInt(body.bookId)
-    const categoryId = parseInt(body.categoryId)
-    
-    if (isNaN(bookId) || isNaN(categoryId)) {
-      return createError({
-        statusCode: 400,
-        message: '无效的图书ID或分类ID'
+        message: '无效的请求数据格式'
       })
     }
     
     try {
-      // 检查关联是否存在
-      const existingRelation = await prisma.bookCategory.findUnique({
-        where: {
-          bookId_categoryId: {
-            bookId,
-            categoryId
-          }
-        },
-        include: {
-          book: true,
-          category: true
-        }
-      })
-      
-      if (!existingRelation) {
-        return createError({
-          statusCode: 404,
-          message: '图书未添加到该分类'
+      // 批量更新分类内图书排序
+      const updatePromises = body.books.map((item: { bookId: number, sortOrder: number }) => 
+        prisma.bookCategory.update({
+          where: {
+            bookId_categoryId: {
+              bookId: item.bookId,
+              categoryId: body.categoryId
+            }
+          },
+          data: { sortOrder: item.sortOrder }
         })
-      }
+      )
       
-      // 删除图书与分类的关联
+      await Promise.all(updatePromises)
+      
+      return { success: true, message: '分类内排序更新成功' }
+    } catch (error) {
+      console.error('更新分类内排序失败:', error)
+      return createError({
+        statusCode: 500,
+        message: '更新分类内排序失败'
+      })
+    }
+  }
+  
+  // DELETE 请求 - 从分类中移除图书
+  if (method === 'DELETE') {
+    const body = await readBody(event)
+    
+    if (!body.bookId || !body.categoryId) {
+      return createError({
+        statusCode: 400,
+        message: '缺少必要参数：bookId和categoryId'
+      })
+    }
+    
+    try {
       await prisma.bookCategory.delete({
         where: {
           bookId_categoryId: {
-            bookId,
-            categoryId
+            bookId: body.bookId,
+            categoryId: body.categoryId
           }
         }
       })
       
-      return {
-        success: true,
-        message: `已从"${existingRelation.category.name}"分类中移除《${existingRelation.book.title}》`,
-      }
+      return { success: true }
     } catch (error) {
       console.error('从分类中移除图书失败:', error)
       return createError({
@@ -257,4 +181,9 @@ export default defineEventHandler(async (event) => {
       })
     }
   }
+  
+  return createError({
+    statusCode: 405,
+    message: '不支持的请求方法'
+  })
 }) 
