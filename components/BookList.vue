@@ -41,19 +41,6 @@
         </div>
       </div>
       
-      <!-- 价格汇总信息 -->
-      <div class="price-summary">
-        <span class="summary-item">
-          <strong>图书总数：</strong>{{ filteredBooks.length }}本
-        </span>
-        <span class="summary-item">
-          <strong>总价值：</strong>{{ formatPrice(totalPrice) }}
-        </span>
-        <span v-if="selectedCategoryId !== 'all'" class="summary-item">
-          <strong>当前分类总价值：</strong>{{ formatPrice(categoryTotalPrice) }}
-        </span>
-      </div>
-      
       <div class="layout-switcher">
         <button 
           @click="layout = 'list'" 
@@ -72,6 +59,19 @@
           <span class="icon">▦</span>
         </button>
       </div>
+    </div>
+    
+    <!-- 价格汇总信息 -->
+    <div class="price-summary">
+      <span class="summary-item">
+        <strong>图书总数：</strong>{{ filteredBooks.length }}本
+      </span>
+      <span class="summary-item">
+        <strong>总价值：</strong>{{ formatPrice(totalPrice) }}
+      </span>
+      <span v-if="selectedCategoryId !== 'all'" class="summary-item">
+        <strong>当前分类总价值：</strong>{{ formatPrice(categoryTotalPrice) }}
+      </span>
     </div>
     
     <!-- 加载状态 -->
@@ -215,26 +215,26 @@
                 <button @click="openAddCategoryDialog(book)" class="add-category-button">添加分类</button>
               </div>
             </div>
-            
-            <div class="actions">
-              <button @click="viewBookDetails(book.id)" class="view-button">详情</button>
-              <button 
-                v-if="!book.borrowedBy" 
-                @click="openBorrowDialog(book)" 
-                class="borrow-button"
-              >
-                借出
-              </button>
-              <button 
-                v-else 
-                @click="returnBook(book.id)" 
-                class="return-button"
-              >
-                归还
-              </button>
-              <button @click="editBook(book.id)" class="edit-button">编辑</button>
-              <button @click="confirmDeleteBook(book)" class="delete-button">删除</button>
-            </div>
+          </div>
+          
+          <div class="actions">
+            <button @click="viewBookDetails(book.id)" class="view-button">详情</button>
+            <button 
+              v-if="!book.borrowedBy" 
+              @click="openBorrowDialog(book)" 
+              class="borrow-button"
+            >
+              借出
+            </button>
+            <button 
+              v-else 
+              @click="returnBook(book.id)" 
+              class="return-button"
+            >
+              归还
+            </button>
+            <button @click="editBook(book.id)" class="edit-button">编辑</button>
+            <button @click="confirmDeleteBook(book)" class="delete-button">删除</button>
           </div>
         </div>
     </div>
@@ -1088,7 +1088,7 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .filter-group {
@@ -1117,6 +1117,7 @@ h2 {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .category-filter select {
@@ -1139,6 +1140,8 @@ h2 {
   cursor: pointer;
   font-size: 0.9rem;
   margin-left: 0.1rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sort-filter {
@@ -1183,8 +1186,9 @@ h2 {
   padding: 0.75rem 1rem;
   background-color: var(--secondary-color);
   border-radius: 8px;
-  margin: 0.5rem 0;
+  margin-bottom: 1.5rem;
   font-size: 0.9rem;
+  flex-wrap: wrap;
 }
 
 .summary-item {
@@ -1411,8 +1415,6 @@ h2 {
   margin-top: 20px;
 }
 
-
-
 .book-card {
   background-color: var(--card-bg);
   border-radius: 8px;
@@ -1434,17 +1436,20 @@ h2 {
 }
 
 .drag-handle {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   color: white;
   border-radius: 4px;
-  padding: 4px 6px;
+  padding: 6px 8px;
   cursor: grab;
   font-size: 12px;
   user-select: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s;
+  z-index: 10;
+}
+
+.drag-handle:hover {
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
 .drag-handle:active {
@@ -1454,6 +1459,8 @@ h2 {
 .drag-icon {
   font-weight: bold;
   letter-spacing: -1px;
+  display: block;
+  line-height: 1;
 }
 
 .sortable-ghost {
@@ -1467,11 +1474,12 @@ h2 {
 }
 
 .sortable-drag {
-  transform: rotate(5deg);
+  transform: rotate(2deg);
   opacity: 0.8;
 }
 
-.book-list-item.draggable {
+.book-list-item.draggable,
+.book-card.draggable {
   cursor: move;
   position: relative;
 }
@@ -1481,18 +1489,10 @@ h2 {
   left: 8px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 10;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border-radius: 4px;
-  padding: 8px 6px;
-  cursor: grab;
-  font-size: 12px;
-  user-select: none;
 }
 
 .book-list-item.draggable .book-cover-small {
-  margin-left: 40px;
+  margin-left: 50px;
 }
 
 .book-cover {
@@ -1826,8 +1826,8 @@ h2 {
   
   .book-card .drag-handle {
     top: 4px;
-    right: 4px;
-    padding: 2px 4px;
+    left: 4px;
+    padding: 4px 6px;
     font-size: 10px;
   }
 }
