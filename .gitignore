@@ -65,3 +65,5 @@ lerna-debug.log*
 *.dvi
 *.ps
 # *.pdf # Uncomment if you want to ignore generated PDFs too
+
+CaiQiLibrary/
