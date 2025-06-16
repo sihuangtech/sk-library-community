@@ -38,6 +38,14 @@ export default defineNuxtConfig({
   
   // 全局中间件配置
   app: {
+    head: {
+      title: appConfig.site.name,
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: `${appConfig.site.name} - 版本 ${appConfig.site.version}` }
+      ]
+    },
     pageTransition: { name: 'page', mode: 'out-in' },
     layoutTransition: { name: 'layout', mode: 'out-in' }
   },
@@ -64,7 +72,11 @@ export default defineNuxtConfig({
       // 应用端口
       appPort: appConfig.server.port,
       // 管理员用户名（可以暴露给客户端）
-      adminUsername: appConfig.admin.username
+      adminUsername: appConfig.admin.username,
+      // 网站信息
+      siteName: appConfig.site.name,
+      siteVersion: appConfig.site.version,
+      copyrightOwner: appConfig.site.copyright_owner
     }
   },
   
