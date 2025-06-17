@@ -36,7 +36,7 @@ database:
 # 管理员账户配置
 admin:
   # 管理员用户名
-  username: "cjj"
+  username: "晨光中"
   # 管理员密码
   password: "09098"
 
