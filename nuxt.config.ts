@@ -1,9 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { loadConfig } from './utils/config'
 
-// 检测是否在Electron环境中运行
-const isElectron = process.env.npm_lifecycle_event?.startsWith('app:')
-
 // 加载YAML配置
 const appConfig = loadConfig()
 
@@ -67,8 +64,6 @@ export default defineNuxtConfig({
       enableDebug: appConfig.debug.enabled,
       // 环境标识
       nodeEnv: process.env.NODE_ENV,
-      // 是否在Electron中运行
-      isElectron: isElectron,
       // 应用端口
       appPort: appConfig.server.port,
       // 管理员用户名（可以暴露给客户端）
@@ -79,9 +74,6 @@ export default defineNuxtConfig({
       copyrightOwner: appConfig.site.copyright_owner
     }
   },
-  
-  // 在Electron模式下使用客户端渲染
-  ssr: isElectron ? false : true,
   
   // Nitro服务器配置（生产模式）
   nitro: {
