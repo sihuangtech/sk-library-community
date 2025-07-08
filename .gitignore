@@ -69,3 +69,6 @@ lerna-debug.log*
 CaiQiLibrary/
 
 .vscode/
+
+# HarmonyOS项目 - 独立仓库
+harmonyos/
