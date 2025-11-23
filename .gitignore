@@ -37,6 +37,7 @@ lerna-debug.log*
 !.env.example
 
 # Configuration files (contains sensitive data)
+config.yaml
 !config.yaml.example
 
 # Database files
