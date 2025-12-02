@@ -1,179 +1,188 @@
-# 家庭图书管理系统
+# SK Library Community Edition - Library Management System
 
-这是一个基于Nuxt.js开发的家庭图书管理系统，可以帮助您管理家庭图书收藏，追踪借阅情况。系统采用现代化的Web技术栈，提供直观易用的界面和强大的功能。
+[简体中文版](README.zh-CN.md) | [English Version](README.md)
 
-## ✨ 功能特点
+A modern library management system built with Nuxt.js that helps you manage book collections and track borrowing activities. The system uses modern web technology stack to provide an intuitive interface and powerful features.
 
-- 📚 **图书管理**：添加、编辑、删除图书，支持ISBN自动获取信息
-- 🔍 **智能搜索**：按标题、作者、ISBN等多维度搜索
-- 📖 **借阅管理**：记录借出和归还情况，逾期提醒
-- 📊 **数据统计**：图书数量、分类、借阅情况统计
-- 🎨 **响应式设计**：适配各种设备屏幕
-- 🗄️ **本地存储**：使用SQLite本地数据库，数据安全可控
-- 🔐 **安全认证**：管理员登录保护，会话管理
-- 🔄 **一键更新**：自动更新系统和数据库备份
+## ✨ Features
 
-## 🚀 快速开始
+- 📚 **Book Management**: Add, edit, delete books with ISBN auto-fetching
+- 🔍 **Smart Search**: Search by title, author, ISBN, and multiple criteria
+- 📖 **Borrowing Management**: Track lending and returns with overdue reminders
+- 📊 **Data Statistics**: Book counts, categories, and borrowing statistics
+- 🎨 **Responsive Design**: Adapts to various device screens
+- 🗄️ **Local Storage**: Uses SQLite local database for secure data control
+- 🔐 **Security Authentication**: Admin login protection with session management
+- 🔄 **One-Click Updates**: Automatic system updates with database backup
 
-### 环境要求
+## 🚀 Quick Start
+
+### Prerequisites
 
 - Node.js 18.0+
 - NPM 8.0+
-- Git（用于更新功能）
+- Git (for update functionality)
 
-### 一键启动
+### One-Click Startup
 
-项目提供了自动化启动脚本，首次使用推荐此方式：
+Automated startup scripts are provided for easy setup:
 
-**Windows系统**
+**Windows System**
 ```bash
 start.bat
 ```
 
-**Mac/Linux系统**
+**Mac/Linux System**
 ```bash
 chmod +x start.sh
 ./start.sh
 ```
 
-启动脚本会自动：
-- 检查环境依赖
-- 引导配置系统（API密钥、管理员账户等）
-- 安装项目依赖
-- 初始化数据库
-- 启动开发服务器
+The startup script automatically:
+- Checks environment dependencies
+- Guides system configuration (API keys, admin accounts, etc.)
+- Installs project dependencies
+- Initializes database
+- Starts development server
 
-### 手动安装
+### Manual Installation
 
 ```bash
-# 1. 安装依赖
+# 1. Install dependencies
 npm install
 
-# 2. 配置系统（复制并编辑配置文件）
+# 2. Configure system (copy and edit config file)
 cp config.yaml.example config.yaml
 
-# 3. 初始化数据库
+# 3. Initialize database
 npx prisma migrate dev --name init
 
-# 4. 启动应用
+# 4. Start application
 npm run dev
 ```
 
-应用将在 http://localhost:3008 启动。
+The application will start at http://localhost:3008.
 
-## 📖 文档
+## 📖 Documentation
 
-详细的使用和部署文档位于 `docs/` 目录：
+Detailed usage and deployment documentation is available in the `docs/` directory:
 
-- **[部署文档](docs/DEPLOYMENT.md)** - 详细的部署步骤、配置说明和生产环境部署
-- **[用户指南](docs/USER_GUIDE.md)** - 完整的功能使用说明和最佳实践
-- **[更新文档](docs/UPDATE.md)** - 一键更新和回滚功能详解
-- **[API文档](docs/API.md)** - 完整的API接口文档和使用示例
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Detailed deployment steps, configuration instructions, and production deployment
+- **[User Guide](docs/USER_GUIDE.md)** - Complete feature usage instructions and best practices
+- **[Update Guide](docs/UPDATE.md)** - One-click update and rollback functionality explained
+- **[API Documentation](docs/API.md)** - Complete API interface documentation with usage examples
 
-## 🔄 系统更新
+## 🔄 System Updates
 
-项目提供了一键更新功能，可以安全地从仓库拉取最新代码：
+The project provides one-click update functionality to safely pull the latest code from the repository:
 
-**Windows系统**
+**Windows System**
 ```bash
 update.bat
 ```
 
-**Mac/Linux系统**
+**Mac/Linux System**
 ```bash
 ./update.sh
 ```
 
-更新功能包含：
-- 自动备份数据库和配置
-- 智能检测新版本
-- 安全的代码更新
-- 依赖包同步
-- 数据库迁移
+Update functionality includes:
+- Automatic database and configuration backup
+- Smart new version detection
+- Safe code updates
+- Dependency package synchronization
+- Database migrations
 
-如果更新出现问题，可以使用回滚脚本快速恢复：
+If issues occur during updates, use the rollback script to quickly restore:
 ```bash
 rollback.bat    # Windows
 ./rollback.sh   # Mac/Linux
 ```
 
-## 🛠️ 技术栈
+## 🛠️ Technology Stack
 
-这是一个基于现代Web技术构建的全栈应用，采用Nuxt.js作为主要框架，集成了Prisma ORM进行数据库管理，使用Tailwind CSS和Nuxt UI构建现代化界面，通过SQLite提供轻量级本地数据存储，并集成第三方ISBN API实现图书信息自动获取功能。
+This is a full-stack application built with modern web technologies, using Nuxt.js as the main framework, integrated with Prisma ORM for database management, Tailwind CSS and Nuxt UI for modern interface design, SQLite for lightweight local data storage, and third-party ISBN API integration for automatic book information retrieval.
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
-├── components/          # Vue组件
-├── layouts/            # 页面布局
-├── pages/              # 页面路由
-├── server/api/         # API端点
-├── prisma/             # 数据库配置
-├── middleware/         # 中间件
-├── plugins/            # 插件
-├── docs/               # 项目文档
-├── start.bat/sh        # 启动脚本
-├── update.bat/sh       # 更新脚本
-├── rollback.bat/sh     # 回滚脚本
-└── config.yaml         # 系统配置
+├── components/          # Vue components
+├── layouts/            # Page layouts
+├── pages/              # Page routing
+├── server/api/         # API endpoints
+├── prisma/             # Database configuration
+├── middleware/         # Middleware
+├── plugins/            # Plugins
+├── docs/               # Project documentation
+├── start.bat/sh        # Startup scripts
+├── update.bat/sh       # Update scripts
+├── rollback.bat/sh     # Rollback scripts
+└── config.yaml         # System configuration
 ```
 
-## 🔧 开发
+## 🔧 Development
 
 ```bash
-# 开发模式
+# Development mode
 npm run dev
 
-# 构建生产版本
+# Build production version
 npm run build
 
-# 预览生产版本
+# Preview production version
 npm run preview
 
-# 数据库管理
+# Database management
 npx prisma studio
 ```
 
-## 🗄️ 数据库
+## 🗄️ Database
 
-系统使用SQLite作为本地数据库，数据文件为 `library.db`。
+The system uses SQLite as the local database, with the data file being `library.db`.
 
-**Web界面初始化**（推荐）：
-1. 登录系统后访问"系统设置"页面
-2. 点击"一键初始化数据库"按钮
+**Web Interface Initialization** (Recommended):
+1. Log in to the system and access the "System Settings" page
+2. Click the "One-Click Database Initialization" button
 
-**命令行初始化**：
+**Command Line Initialization**:
 ```bash
 npx prisma migrate dev --name init
 ```
 
-## 🔐 认证与安全
+## 🔐 Authentication & Security
 
-- 基于Cookie的会话认证
-- 管理员账户保护
-- 所有管理功能需要登录
-- 配置文件中设置管理员凭据
+- Cookie-based session authentication
+- Admin account protection
+- All management functions require login
+- Admin credentials set in configuration file
 
 ## 📝 ISBN API
 
-本项目使用 [ISBN Market API](https://market.isbn.work/) 获取图书信息。需要在配置文件中设置API密钥。
+This project uses [ISBN Market API](https://market.isbn.work/) to retrieve book information. API key needs to be set in the configuration file.
 
-## 🤝 贡献
+## 🤝 Contributing
 
-1. Fork 本仓库
-2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
-3. 提交更改 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 开启 Pull Request
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add some amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📄 许可证
+## 📄 License
 
-本项目基于 MIT 许可证开源。查看 [LICENSE](LICENSE) 文件了解更多信息。
+This project is licensed under GNU General Public License v3.0 (GPL-3.0), an open-source license that prohibits commercial use. See [LICENSE](LICENSE) file for more information.
 
-## 🆘 支持
+**Important Restrictions**:
+- Commercial use is prohibited
+- Any derivative works based on this software must also be open-source
+- Full source code must be provided when distributing
 
-- 📖 查阅 [用户指南](docs/USER_GUIDE.md) 了解详细使用方法
-- 🚀 查阅 [部署文档](docs/DEPLOYMENT.md) 了解部署和配置
-- 🔄 查阅 [更新文档](docs/UPDATE.md) 了解更新和维护
-- 🔧 查阅 [API文档](docs/API.md) 了解接口详情
-- 💬 在项目仓库提交 Issue 获取技术支持
+## 🆘 Support
+
+- 📖 Check [User Guide](docs/USER_GUIDE.md) for detailed usage instructions
+- 🚀 Check [Deployment Guide](docs/DEPLOYMENT.md) for deployment and configuration
+- 🔄 Check [Update Guide](docs/UPDATE.md) for updates and maintenance
+- 🔧 Check [API Documentation](docs/API.md) for interface details
+- 💬 Submit Issues in the project repository for technical support
+- 🐧 Join QQ Group: [SK Opensource Exchange Group](https://qm.qq.com/q/SKoSDvRaMi) for community support and discussion
+- 🎮 Join Discord: [SK Opensource Exchange Server](https://discord.gg/thWGWq7CwA) for international community support

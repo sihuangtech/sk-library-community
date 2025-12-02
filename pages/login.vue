@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-form">
-      <h1>家庭图书管理系统</h1>
+      <h1>图书管理系统</h1>
       <h2>管理员登录</h2>
       
       <div class="form-group">

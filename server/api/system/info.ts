@@ -248,7 +248,7 @@ export default defineEventHandler(async (event) => {
         heapTotal: '0 MB',
         external: '0 MB'
       },
-      siteName: '家庭图书管理系统',
+      siteName: '图书管理系统',
       nuxtVersion: 'unknown',
       vueVersion: 'unknown',
       prismaVersion: 'unknown',

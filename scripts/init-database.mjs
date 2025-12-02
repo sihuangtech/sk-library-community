@@ -7,7 +7,7 @@ import { join } from 'path'
 
 const execAsync = promisify(exec)
 
-console.log('🚀 开始初始化家庭图书管理系统数据库...\n')
+console.log('🚀 开始初始化图书管理系统数据库...\n')
 
 async function initDatabase() {
   try {

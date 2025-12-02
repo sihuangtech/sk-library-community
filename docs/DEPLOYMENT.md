@@ -1,6 +1,6 @@
 # 部署文档
 
-本文档详细介绍如何部署家庭图书管理系统。
+本文档详细介绍如何部署图书管理系统。
 
 ## 环境要求
 
@@ -115,7 +115,7 @@ server:
 
 # 网站信息配置
 site:
-  name: "家庭图书管理系统"
+  name: "图书管理系统"
   version: "1.0.0"
   copyright_owner: "彩旗工作室"
   filing:
@@ -283,7 +283,7 @@ Systemd 是 Linux 系统中广泛使用的初始化系统和服务管理器。�
     sudo journalctl -u family-library -f
     ```
 
-现在，您的家庭图书管理系统就会作为 Systemd 服务在后台运行了。
+现在，您的图书管理系统就会作为 Systemd 服务在后台运行了。
 
 ### 5. Nginx反向代理配置
 ```nginx

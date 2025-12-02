@@ -1,8 +1,8 @@
 <template>
   <div class="home-page">
     <div class="hero">
-      <h1>家庭图书管理系统</h1>
-      <p>轻松管理您家庭的图书收藏，追踪借阅情况</p>
+      <h1>图书管理系统</h1>
+<p>轻松管理您的图书收藏，追踪借阅情况</p>
       
       <div v-if="isDebugMode" class="user-info">
         <p>欢迎回来，管理员！</p>

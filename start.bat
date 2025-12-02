@@ -1,5 +1,5 @@
 @echo off
-echo 正在启动家庭图书管理系统...
+echo 正在启动图书管理系统...
 
 REM 检查Node.js是否安装
 where node >nul 2>nul

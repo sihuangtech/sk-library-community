@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <div class="navbar-brand">
-      <h1>家庭图书管理系统</h1>
+      <h1>图书管理系统</h1>
     </div>
     
     <!-- 导航菜单 -->

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "正在启动家庭图书管理系统..."
+echo "正在启动图书管理系统..."
 
 # 检查Node.js是否安装
 if ! command -v node &> /dev/null; then
