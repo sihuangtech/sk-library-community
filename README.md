@@ -15,6 +15,10 @@ A modern library management system built with Nuxt.js that helps you manage book
 - 🔐 **Security Authentication**: Admin login protection with session management
 - 🔄 **One-Click Updates**: Automatic system updates with database backup
 
+## ☁️ Cloud Hosting Option
+
+Deploying this system requires a server environment. If you don't have server deployment experience or don't have access to a server, we recommend trying our cloud-hosted version: **SK Library (library.skstudio.cn)** - a fully managed library management service that is ready to use immediately and requires no technical setup.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -186,3 +190,7 @@ This project is licensed under GNU General Public License v3.0 (GPL-3.0), an ope
 - 💬 Submit Issues in the project repository for technical support
 - 🐧 Join QQ Group: [SK Opensource Exchange Group](https://qm.qq.com/q/SKoSDvRaMi) for community support and discussion
 - 🎮 Join Discord: [SK Opensource Exchange Server](https://discord.gg/thWGWq7CwA) for international community support
+
+## ⭐️ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=sihuangtech/sk-library-community&type=date&legend=top-left)](https://www.star-history.com/#sihuangtech/sk-library-community&type=date&legend=top-left)

@@ -15,6 +15,10 @@
 - 🔐 **安全认证**：管理员登录保护，会话管理
 - 🔄 **一键更新**：自动更新系统和数据库备份
 
+## ☁️ 云托管选项
+
+部署本系统需要服务器环境。如果您没有服务器部署经验或没有服务器资源，欢迎尝试我们的云托管版本：**彩旗藏书 (library.skstudio.cn)** - 这是一个完全托管的图书馆管理服务，即开即用，无需任何技术设置。
+
 ## 🚀 快速开始
 
 ### 环境要求
@@ -186,3 +190,7 @@ npx prisma migrate dev --name init
 - 💬 在项目仓库提交 Issue 获取技术支持
 - 🐧 加入QQ群：[彩旗开源交流群](https://qm.qq.com/q/SKoSDvRaMi) 获取社区支持和交流
 - 🎮 加入Discord：[彩旗开源交流服务器](https://discord.gg/thWGWq7CwA) 获取国际社区支持
+
+## ⭐️ 星标历史
+
+[![Star History Chart](https://api.star-history.com/svg?repos=sihuangtech/sk-library-community&type=date&legend=top-left)](https://www.star-history.com/#sihuangtech/sk-library-community&type=date&legend=top-left)
