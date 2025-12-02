@@ -1,6 +1,10 @@
 # 彩旗藏书社区版 - 图书管理系统
 
-<p align="center">[English Version](README.md) | [简体中文版](README.zh-CN.md)</p>
+<div align="center">
+
+[English Version](README.md) | [简体中文版](README.zh-CN.md)
+
+</div>
 
 这是一个基于Nuxt.js开发的图书管理系统，可以帮助您管理图书收藏，追踪借阅情况。系统采用现代化的Web技术栈，提供直观易用的界面和强大的功能。
 

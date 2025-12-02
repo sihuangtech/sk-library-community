@@ -1,6 +1,10 @@
 # SK Library Community Edition - Library Management System
 
-<p align="center">[简体中文版](README.zh-CN.md) | [English Version](README.md)</p>
+<div align="center">
+
+[简体中文版](README.zh-CN.md) | [English Version](README.md)
+
+</div>
 
 A modern library management system built with Nuxt.js that helps you manage book collections and track borrowing activities. The system uses modern web technology stack to provide an intuitive interface and powerful features.
 
