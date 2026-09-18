@@ -73,3 +73,5 @@ CaiQiLibrary/
 
 # HarmonyOS项目 - 独立仓库
 harmonyos/
+# Nuxt 自动生成的模块配置
+.nuxtrc
